@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Lobo Palu | Koleksi Saya</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fbfbe2", "surface-container": "#efefd7",
+                        "primary-container": "#800000", "secondary-container": "#fed65b",
+                        "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+                        "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+                        "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+                        "outline": "#8e706c", "surface-variant": "#e4e4cc",
+                        "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+                        "tertiary": "#262727", "secondary": "#735c00",
+                        "surface-container-high": "#eaead1",
+                        "surface-container-highest": "#e4e4cc",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#570000", "on-primary-container": "#ff8371",
+                        "error-container": "#ffdad6", "tertiary-container": "#3c3c3c",
+                        "on-tertiary-container": "#a8a6a6",
+                    },
+                    fontFamily: { "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"] },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            background: #166534;
+            color: #fff;
+        }
+
+        .toast-error {
+            background: #991b1b;
+            color: #fff;
+        }
+
+        .nav-link {
+            transition: all 0.4s ease-in-out;
+        }
+
+        .nav-link:hover {
+            transform: translateX(4px);
+        }
+
+        .nav-active {
+            background: rgba(231, 229, 228, 0.5);
+            color: #7f1d1d;
+            border-right: 4px solid #d97706;
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface" data-sidebar="open">
+    <style>
+        /* Responsive Sidebar Styles */
+        body[data-sidebar="open"] #sidebar { transform: translateX(0); }
+        body[data-sidebar="closed"] #sidebar { transform: translateX(-100%); }
+        
+        @media (min-width: 768px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 18rem; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 0; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+        }
+        
+        body[data-sidebar="open"] #openSidebarBtn { display: none !important; }
+        body[data-sidebar="closed"] #openSidebarBtn { display: block !important; }
+
+        /* Mobile Overlay */
+        #mobileOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 40;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mobileOverlay { display: block; }
+        }
+    </style>
+    <div id="toast" class="toast"></div>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="h-screen w-72 fixed left-0 top-0 border-r border-stone-200/30 bg-stone-100/80 backdrop-blur-2xl flex flex-col py-8 px-4 gap-6 shadow-[20px_0_40px_rgba(27,29,14,0.04)] z-50 transition-transform duration-300">
+        <div class="flex items-center justify-between px-4 mb-8">
+            <div class="flex flex-col gap-1">
+                <h1 class="font-serif font-black text-red-950 text-2xl tracking-tight">Lobo Palu</h1>
+                <p class="font-serif text-sm tracking-wide text-stone-500">Digital Curator</p>
+            </div>
+            <button onclick="toggleSidebar()" class="p-2 bg-stone-200/50 hover:bg-stone-300 text-stone-600 hover:text-primary rounded-lg transition-all focus:outline-none" title="Tutup Menu">
+                <span class="material-symbols-outlined text-xl">menu_open</span>
+            </button>
+        </div>
+        <nav class="flex-1 flex flex-col gap-2">
+            <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                href="user-home.html">
+                <span class="material-symbols-outlined">home</span>
+                <span>Home</span>
+            </a>
+            <a class="nav-link nav-active flex items-center gap-4 px-4 py-3 font-serif text-sm tracking-wide"
+                href="user-collections.html">
+                <span class="material-symbols-outlined"
+                    style="font-variation-settings: 'FILL' 1;">collections_bookmark</span>
+                <span>Collections</span>
+            </a>
+            <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                href="user-portal.html">
+                <span class="material-symbols-outlined">person</span>
+                <span>Profile</span>
+            </a>
+            <div id="adminNavSection" class="hidden mt-4 pt-4 border-t border-stone-200/20">
+                <p class="px-4 text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Admin</p>
+                <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                    href="admin-dashboard.html">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                    href="admin-collections.html">
+                    <span class="material-symbols-outlined">library_books</span>
+                    <span>Manage Data</span>
+                </a>
+            </div>
+        </nav>
+        <div class="mt-auto flex flex-col gap-2 px-4 border-t border-stone-200/30 pt-6">
+            <a class="nav-link flex items-center gap-4 py-2 text-stone-500 font-serif text-sm cursor-pointer"
+                onclick="logout()">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="min-h-screen p-6 md:p-12 relative transition-all duration-300">
+        
+        <!-- Open Sidebar Button -->
+        <div class="sticky top-6 z-[30] mb-8 w-fit hidden" id="openSidebarBtn">
+            <button onclick="toggleSidebar()" class="w-11 h-11 bg-white border border-stone-200/50 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.08)] text-stone-600 hover:text-primary hover:border-primary/30 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-0 group" title="Buka Menu">
+                <span class="material-symbols-outlined text-[22px] transition-transform duration-300 group-hover:scale-110">menu</span>
+            </button>
+        </div>
+
+        <div class="absolute inset-0 opacity-5 pointer-events-none"></div>
+
+        <!-- Header -->
+        <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-0 mb-8 md:mb-12">
+            <div>
+                <span class="text-secondary font-bold tracking-widest uppercase text-xs mb-2 block">My
+                    Collections</span>
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-on-surface leading-tight">Koleksi <span
+                        class="italic text-primary">Saya</span></h2>
+            </div>
+            <div class="flex gap-8 w-full md:w-auto mt-2 md:mt-0">
+                <div class="text-left md:text-right w-full">
+                    <p id="statItems" class="text-3xl font-headline font-bold text-primary">—</p>
+                    <p class="text-xs uppercase tracking-tighter text-on-surface-variant font-medium">Items Contributed
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contribute Form -->
+        <section class="mb-20 relative z-10">
+            <div
+                class="bg-surface-container-lowest p-6 md:p-10 rounded-xl shadow-[0_20px_40px_rgba(27,29,14,0.06)] relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 opacity-5 pointer-events-none">
+                    <svg class="fill-primary" viewBox="0 0 100 100">
+                        <path d="M50 0 L100 50 L50 100 L0 50 Z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-headline font-bold mb-8 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">add_circle</span>
+                    Tambah Arsip Baru
+                </h3>
+                <form id="contributeForm" class="flex flex-col gap-6" onsubmit="handleContribute(event)">
+                    <!-- Nama Arsip -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Nama Arsip <span
+                                class="text-error">*</span></label>
+                        <input id="contribTitle"
+                            class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all"
+                            placeholder="e.g. Kain Tenun Donggala 1920" type="text" required />
+                    </div>
+
+                    <!-- Nama Pembuat / Pemilik Arsip -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Nama Pembuat / Pemilik Arsip</label>
+                        <input id="contribCreator"
+                            class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all"
+                            placeholder="e.g. Anonim, Bpk. Budi, dll" type="text" />
+                    </div>
+
+                    <!-- Kategori -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Kategori <span
+                                class="text-error">*</span></label>
+                        <input type="hidden" id="contribCategory" value="" required />
+                        <div class="relative" id="categoryDropdown">
+                            <button type="button" onclick="toggleCategoryDropdown()"
+                                class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm text-left flex items-center justify-between hover:border-secondary transition-all">
+                                <span id="categoryLabel" class="text-on-surface-variant">Pilih kategori</span>
+                                <span class="material-symbols-outlined text-lg text-outline transition-transform"
+                                    id="categoryArrow">expand_more</span>
+                            </button>
+                            <div id="categoryList"
+                                class="hidden absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg shadow-xl z-30 overflow-hidden">
+                                <div class="max-h-[144px] overflow-y-auto" style="scrollbar-width: thin;">
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Photography">Photography</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Cinematography">Cinematography</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Manuscript">Manuscript</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Oral History">Oral History</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Textile">Textile</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Audio Record">Audio Record</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Video">Video</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Artifact">Artifact</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Lukisan">Lukisan</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Tari">Tari</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Cerpen">Cerpen</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Puisi">Puisi</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Teater">Teater</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Musik Tradisional">Musik Tradisional</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Kerajinan">Kerajinan</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Ritual">Ritual</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Cerita Rakyat">Cerita Rakyat</div>
+                                    <div class="cat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors"
+                                        data-val="Arsitektur Tradisional">Arsitektur Tradisional</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Deskripsi</label>
+                        <textarea id="contribDescription"
+                            class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all resize-vertical"
+                            placeholder="Jelaskan konteks dan sejarah arsip ini..." rows="4"></textarea>
+                    </div>
+
+                    <!-- Tanggal -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Tanggal <span
+                                class="text-error">*</span></label>
+                        <input id="contribDate" type="date"
+                            class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all"
+                            required />
+                    </div>
+
+                    <!-- File Dokumen/Media -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">File Dokumen/Media</label>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 border border-outline-variant/40 rounded-lg overflow-hidden">
+                                <input id="contribFile" type="file" accept=".mp3,.wav,.mp4,.pdf,.jpg,.jpeg,.png"
+                                    class="w-full text-sm text-on-surface-variant file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-surface-container-high file:text-on-surface cursor-pointer"
+                                    onchange="handleContribFileSelect(this)" />
+                            </div>
+                            <span class="material-symbols-outlined text-outline text-xl">upload</span>
+                        </div>
+                        <p class="text-xs text-secondary/70 mt-1 italic">Format: .mp3, .wav, .mp4, .pdf, .jpg, .png,
+                            .jpeg (Maks 50MB)</p>
+                        <div id="contribFileInfo" class="text-xs text-stone-500 mt-1 hidden items-center gap-1.5">
+                            <span id="contribFileNameText"></span>
+                            <button type="button" onclick="clearContribFile()" class="inline-flex items-center justify-center p-0.5 rounded-full hover:bg-stone-200 text-error hover:text-red-700 transition-colors" title="Hapus file">
+                                <span class="material-symbols-outlined text-xs leading-none">close</span>
+                            </button>
+                        </div>
+                        <div id="contribFilePreview"
+                            class="hidden mt-3 w-full bg-surface-container-lowest rounded-md border border-outline-variant/20 p-2 overflow-hidden flex items-center justify-center min-h-[100px]">
+                        </div>
+                    </div>
+
+                    <!-- Gambar Thumbnail -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Gambar Thumbnail</label>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 border border-outline-variant/40 rounded-lg overflow-hidden">
+                                <input id="contribThumbnail" type="file" accept=".jpg,.jpeg,.png"
+                                    class="w-full text-sm text-on-surface-variant file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-surface-container-high file:text-on-surface cursor-pointer"
+                                    onchange="handleThumbnailSelect(this)" />
+                            </div>
+                            <span class="material-symbols-outlined text-outline text-xl">upload</span>
+                        </div>
+                        <p class="text-xs text-secondary/70 mt-1 italic">Format: .jpg, .jpeg, .png (Maks 50MB)</p>
+                        <div id="contribThumbInfo" class="text-xs text-stone-500 mt-1 hidden items-center gap-1.5">
+                            <span id="contribThumbNameText"></span>
+                            <button type="button" onclick="clearContribThumb()" class="inline-flex items-center justify-center p-0.5 rounded-full hover:bg-stone-200 text-error hover:text-red-700 transition-colors" title="Hapus thumbnail">
+                                <span class="material-symbols-outlined text-xs leading-none">close</span>
+                            </button>
+                        </div>
+                        <div id="contribThumbPreview"
+                            class="hidden mt-3 max-w-sm bg-surface-container-lowest rounded-md border border-outline-variant/20 p-2 overflow-hidden flex items-center justify-center">
+                        </div>
+                    </div>
+
+                    <!-- Catatan Pribadi -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Catatan Pribadi</label>
+                        <textarea id="contribNotes"
+                            class="w-full bg-transparent border border-outline-variant/40 rounded-lg px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all resize-vertical"
+                            placeholder="Catatan tambahan (opsional)..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-col md:flex-row gap-4 mt-2">
+                        <button id="contribBtn"
+                            class="flex-1 bg-primary text-on-primary py-3.5 rounded-lg text-sm font-bold tracking-wide shadow-md hover:bg-primary-container transition-colors flex items-center justify-center gap-2 w-full md:w-auto"
+                            type="submit">
+                            <span id="contribBtnText">Simpan</span>
+                            <span id="contribSpinner"
+                                class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                        </button>
+                        <button
+                            class="px-8 py-3.5 rounded-lg border border-outline-variant/40 text-sm font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors w-full md:w-auto"
+                            type="button" onclick="resetForm()">Batal</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- My Collections Header -->
+        <div class="relative flex items-center justify-center mb-12">
+            <div class="flex-grow h-[1px] bg-gradient-to-r from-transparent via-secondary/40 to-secondary/10"></div>
+            <h3 class="px-8 text-2xl font-headline font-bold italic text-on-surface">My Collections</h3>
+            <div class="flex-grow h-[1px] bg-gradient-to-l from-transparent via-secondary/40 to-secondary/10"></div>
+        </div>
+
+        <!-- Collections Grid -->
+        <section id="myCollectionsGrid"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10 pb-20">
+            <div class="col-span-full text-center py-16 text-stone-400">
+                <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                <p class="text-sm">Memuat koleksi Anda...</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-24 border-t border-outline-variant/30 pt-16 bg-surface-container relative z-10 w-full">
+            <div
+                class="px-8 lg:px-12 grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-12 text-sm text-on-surface-variant mb-16">
+
+                <!-- Company Info & Addresses -->
+                <div class="space-y-6">
+                    <div>
+                        <h2
+                            class="font-serif font-black text-primary text-2xl tracking-tight mb-1 flex items-center gap-2">
+                            Lobo Palu
+                        </h2>
+                        <p class="font-serif text-[10px] tracking-widest text-stone-500 uppercase">Kreator Digital</p>
+                    </div>
+                    <p class="leading-loose text-sm">
+                        Palu, Sulawesi Tengah<br>
+                        Jl. Seni Budaya No. 12<br>
+                        Kota Palu 90221
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-4 text-xs mt-6">
+                        <div>
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">call</span> Telepon</p>
+                            <p>+62 812 3456 7890</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">mail</span> Email</p>
+                            <p>info@lobopalu.org</p>
+                        </div>
+                        <div class="col-span-2 mt-2">
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">support_agent</span> Layanan Pelanggan
+                            </p>
+                            <p>0812 3456 7890 (WA)<br>Support: support@lobopalu.org</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produk & Layanan -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Produk & Layanan</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Arsip Kebudayaan Lokal</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Digitalisasi Artefak</a></li>
+                    </ul>
+                    <h3 class="font-bold text-base text-on-surface mb-6 mt-8">Solusi</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Penelusuran Koleksi Ekstensif</a>
+                        </li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Kontribusi Publik Terbuka</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Analisis Data Budaya</a></li>
+                    </ul>
+                </div>
+
+                <!-- Tentang Kami -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Tentang Kami</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Mengenal Lobo Palu</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Mengapa Lobo Palu</a></li>
+                    </ul>
+                    <h3 class="font-bold text-base text-on-surface mb-6 mt-8">Media & Informasi</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Berita & Publikasi</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Blog Kegiatan Seni</a></li>
+                    </ul>
+                </div>
+
+                <!-- CSR / Lainnya -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Informasi Lain</h3>
+                    <ul class="space-y-5 text-on-surface text-sm">
+                        <li><a href="#" class="hover:text-primary transition-colors">Sponsorship & CSR</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Jangkauan Layanan</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Whistleblowing System</a>
+                        </li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Karir Relawan</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Privacy Notice</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Bantuan Teknis (FAQ)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright Section -->
+            <div
+                class="bg-primary text-on-primary py-6 px-8 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 relative shadow-[inset_0_4px_20px_rgba(0,0,0,0.2)]">
+
+                <div class="flex items-center gap-6">
+                    <!-- Social Media -->
+                    <div class="flex gap-4 items-center">
+                        <a href="https://www.linkedin.com/in/komunitaslobo/"
+                            class="hover:text-secondary hover:-translate-y-1 transition-all" title="LinkedIn">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all"
+                            title="X (Twitter)">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/komunitaslobo"
+                            class="hover:text-secondary hover:-translate-y-1 transition-all" title="Instagram">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069v-2.162zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all" title="Facebook">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M22.675 0h-21.35C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all" title="YouTube">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div
+                    class="text-[11px] md:text-sm text-center font-medium opacity-90 mx-auto w-full md:w-auto mt-4 md:mt-0">
+                    Copyright © 2024 Arsip Digital Komunitas Seni Lobo Palu. All rights reserved.
+                </div>
+
+                <div
+                    class="text-center md:text-right flex flex-col items-center md:items-end w-full md:w-auto mt-4 md:mt-0 mr-4">
+                    <span class="text-[9px] tracking-widest uppercase text-secondary/70 font-bold mb-1">Kolaborasi
+                        Oleh</span>
+                    <span class="font-serif font-black text-lg tracking-wider text-orange-200"
+                        style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">komunitas lobo<span
+                            class="text-secondary text-2xl leading-none">.</span></span>
+                </div>
+
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    class="absolute -top-6 left-8 bg-primary-container text-white p-2 md:p-3 shadow-xl hover:bg-secondary hover:text-on-secondary transition-all hover:-translate-y-2 rounded-md">
+                    <span class="material-symbols-outlined text-xl leading-none block">expand_less</span>
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirected */ }
+
+        const currentUser = getUser();
+        let contribSelectedFile = null;
+        let contribSelectedThumb = null;
+
+        // Set default date to today
+        document.getElementById('contribDate').valueAsDate = new Date();
+
+        if (currentUser && currentUser.role === 'admin') {
+            document.getElementById('adminNavSection').classList.remove('hidden');
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = `toast toast-${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Mobile Responsiveness Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth < 768) {
+                document.body.setAttribute('data-sidebar', 'closed');
+            }
+        });
+
+        // Sidebar Toggle Logic
+        function toggleSidebar() {
+            const body = document.body;
+            if (body.getAttribute('data-sidebar') === 'open') {
+                body.setAttribute('data-sidebar', 'closed');
+            } else {
+                body.setAttribute('data-sidebar', 'open');
+            }
+        }
+
+        function clearContribFile() {
+            contribSelectedFile = null;
+            document.getElementById('contribFile').value = '';
+            document.getElementById('contribFileInfo').classList.add('hidden');
+            document.getElementById('contribFilePreview').classList.add('hidden');
+            document.getElementById('contribFilePreview').innerHTML = '';
+        }
+
+        function clearContribThumb() {
+            contribSelectedThumb = null;
+            document.getElementById('contribThumbnail').value = '';
+            document.getElementById('contribThumbInfo').classList.add('hidden');
+            document.getElementById('contribThumbPreview').classList.add('hidden');
+            document.getElementById('contribThumbPreview').innerHTML = '';
+        }
+
+        function handleContribFileSelect(input) {
+            if (input.files && input.files[0]) {
+                contribSelectedFile = input.files[0];
+                document.getElementById('contribFileNameText').textContent = `Selected: ${contribSelectedFile.name} (${(contribSelectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+                document.getElementById('contribFileInfo').classList.remove('hidden');
+                document.getElementById('contribFileInfo').classList.add('flex');
+
+                const preview = document.getElementById('contribFilePreview');
+                preview.classList.remove('hidden');
+                preview.innerHTML = '';
+
+                const file = contribSelectedFile;
+                const url = URL.createObjectURL(file);
+                const type = file.type;
+
+                if (type.startsWith('image/')) {
+                    preview.innerHTML = `<img src="${url}" class="rounded h-auto max-h-48 object-contain" />`;
+                } else if (type.startsWith('video/')) {
+                    preview.innerHTML = `<video src="${url}" controls class="rounded max-h-48 w-full bg-black"></video>`;
+                } else if (type.startsWith('audio/')) {
+                    preview.innerHTML = `<audio src="${url}" controls class="w-full"></audio>`;
+                } else if (type === 'application/pdf') {
+                    preview.innerHTML = `<iframe src="${url}" class="rounded border h-64 w-full"></iframe>`;
+                } else {
+                    preview.innerHTML = `<div class="p-4 text-center text-sm text-on-surface-variant font-medium"><span class="material-symbols-outlined block text-3xl mb-1 text-outline">description</span>File siap diunggah</div>`;
+                }
+            }
+        }
+
+        function handleThumbnailSelect(input) {
+            if (input.files && input.files[0]) {
+                contribSelectedThumb = input.files[0];
+                document.getElementById('contribThumbNameText').textContent = `Selected: ${contribSelectedThumb.name} (${(contribSelectedThumb.size / 1024 / 1024).toFixed(2)} MB)`;
+                document.getElementById('contribThumbInfo').classList.remove('hidden');
+                document.getElementById('contribThumbInfo').classList.add('flex');
+
+                const preview = document.getElementById('contribThumbPreview');
+                preview.classList.remove('hidden');
+                const url = URL.createObjectURL(contribSelectedThumb);
+                preview.innerHTML = `<img src="${url}" class="rounded h-auto max-h-32 object-contain" />`;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('contributeForm').reset();
+            contribSelectedFile = null;
+            contribSelectedThumb = null;
+            document.getElementById('contribFileInfo').classList.add('hidden');
+            document.getElementById('contribThumbInfo').classList.add('hidden');
+            document.getElementById('contribFilePreview').classList.add('hidden');
+            document.getElementById('contribFilePreview').innerHTML = '';
+            document.getElementById('contribThumbPreview').classList.add('hidden');
+            document.getElementById('contribThumbPreview').innerHTML = '';
+            document.getElementById('contribCategory').value = '';
+            document.getElementById('categoryLabel').textContent = 'Pilih kategori';
+            document.getElementById('categoryLabel').classList.add('text-on-surface-variant');
+            document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('bg-surface-container-high', 'font-medium'));
+            document.getElementById('contribDate').valueAsDate = new Date();
+            document.getElementById('contribCreator').value = '';
+        }
+
+        let currentLoadedCollections = [];
+
+        async function loadMyCollections() {
+            try {
+                const result = await apiGetCollections({ user_id: currentUser.id, limit: 50 });
+                currentLoadedCollections = result.data || [];
+                document.getElementById('statItems').textContent = result.total || 0;
+                renderCollections(currentLoadedCollections);
+            } catch (err) {
+                console.error('Load error:', err);
+                showToast('Gagal memuat koleksi', 'error');
+            }
+        }
+
+        function renderCollections(items) {
+            const grid = document.getElementById('myCollectionsGrid');
+            if (!items || items.length === 0) {
+                grid.innerHTML = `
+                <div class="col-span-full text-center py-16 text-stone-400">
+                    <span class="material-symbols-outlined text-5xl mb-4 block">collections_bookmark</span>
+                    <p class="text-lg font-headline font-bold text-stone-500 mb-2">Belum ada koleksi</p>
+                    <p class="text-sm">Gunakan form di atas untuk menambahkan kontribusi pertama Anda.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map((item, idx) => `
+            <div class="group relative bg-surface-container-low p-4 rounded-xl border border-transparent hover:border-outline-variant/20 transition-all duration-500 hover:-translate-y-2 cursor-pointer flex flex-col h-full" onclick="openPreviewModal('${item.id}')">
+                <div class="aspect-[4/5] shrink-0 overflow-hidden rounded-lg mb-6 shadow-md bg-stone-200 flex items-center justify-center">
+                    ${item.thumbnail_url || item.file_url
+                    ? `<img alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="${item.thumbnail_url || item.file_url}"/>`
+                    : `<span class="material-symbols-outlined text-5xl text-stone-400">image</span>`
+                }
+                </div>
+                <div class="px-2 flex flex-col flex-grow">
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">${item.category || '—'} ${item.historical_date ? '• ' + item.historical_date : ''}</span>
+                    <h4 class="text-lg font-headline font-bold mt-1 group-hover:text-primary transition-colors">${item.title}</h4>
+                    <p class="text-xs text-on-surface-variant font-medium mt-1"><span class="material-symbols-outlined text-[12px] inline-block align-middle mr-1">person</span> ${item.creator_name || 'Anonim'}</p>
+                    <p class="text-xs text-on-surface-variant line-clamp-2 mt-2 font-light leading-relaxed whitespace-pre-line">${(item.description || '—').replace(/\[Catatan Pribadi\]:\s*/g, 'Catatan Pribadi:\n')}</p>
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
+                        <span class="text-[10px] font-medium text-outline">${timeAgo(item.updated_at || item.created_at)}</span>
+                        <div class="flex gap-2">
+                            <button onclick="event.stopPropagation(); showToast('Fitur edit akan segera hadir', 'info')" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors">
+                                <span class="material-symbols-outlined text-lg">edit_note</span>
+                            </button>
+                            <button onclick="event.stopPropagation(); handleDelete('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-error hover:bg-error-container/20 transition-colors">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        async function handleContribute(e) {
+            e.preventDefault();
+            const title = document.getElementById('contribTitle').value;
+            const creator_name = document.getElementById('contribCreator').value;
+            const category = document.getElementById('contribCategory').value;
+            const description = document.getElementById('contribDescription').value;
+            const contribDate = document.getElementById('contribDate').value;
+            const notes = document.getElementById('contribNotes').value;
+
+            if (!category) { showToast('Pilih kategori terlebih dahulu', 'error'); return; }
+
+            document.getElementById('contribBtnText').textContent = 'Menyimpan...';
+            document.getElementById('contribSpinner').classList.remove('hidden');
+            document.getElementById('contribBtn').disabled = true;
+
+            try {
+                let fileUrl = '';
+                let thumbUrl = '';
+
+                // Upload main file
+                if (contribSelectedFile) {
+                    const uploadResult = await apiUploadFile(contribSelectedFile);
+                    fileUrl = uploadResult.url || '';
+                }
+
+                // Upload thumbnail
+                if (contribSelectedThumb) {
+                    const thumbResult = await apiUploadFile(contribSelectedThumb);
+                    thumbUrl = thumbResult.url || '';
+                }
+
+                const data = {
+                    title,
+                    creator_name,
+                    category,
+                    description: description + (notes ? '\n\nCatatan Pribadi:\n' + notes : ''),
+                    historical_date: contribDate
+                };
+                if (fileUrl) data.file_url = fileUrl;
+                if (thumbUrl) data.thumbnail_url = thumbUrl;
+                // If no separate thumbnail but file is an image, use file as thumbnail
+                if (!thumbUrl && fileUrl && contribSelectedFile && /\.(jpg|jpeg|png)$/i.test(contribSelectedFile.name)) {
+                    data.thumbnail_url = fileUrl;
+                }
+
+                await apiCreateCollection(data);
+                showToast('Arsip berhasil disimpan!');
+                resetForm();
+                loadMyCollections();
+            } catch (err) {
+                showToast(err.message || 'Gagal menyimpan', 'error');
+            } finally {
+                document.getElementById('contribBtnText').textContent = 'Simpan';
+                document.getElementById('contribSpinner').classList.add('hidden');
+                document.getElementById('contribBtn').disabled = false;
+            }
+        }
+
+        async function handleDelete(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus item ini?')) return;
+            try {
+                await apiDeleteCollection(id);
+                showToast('Item berhasil dihapus');
+                loadMyCollections();
+            } catch (err) {
+                showToast(err.message || 'Gagal menghapus', 'error');
+            }
+        }
+
+        // ── Custom Category Dropdown ──
+        function toggleCategoryDropdown() {
+            const list = document.getElementById('categoryList');
+            const arrow = document.getElementById('categoryArrow');
+            list.classList.toggle('hidden');
+            arrow.style.transform = list.classList.contains('hidden') ? '' : 'rotate(180deg)';
+        }
+
+        document.querySelectorAll('.cat-opt').forEach(opt => {
+            opt.addEventListener('click', function () {
+                const val = this.dataset.val;
+                document.getElementById('contribCategory').value = val;
+                document.getElementById('categoryLabel').textContent = val;
+                document.getElementById('categoryLabel').classList.remove('text-on-surface-variant');
+                document.querySelectorAll('.cat-opt').forEach(o => {
+                    o.classList.remove('bg-surface-container-high', 'font-medium');
+                });
+                this.classList.add('bg-surface-container-high', 'font-medium');
+                document.getElementById('categoryList').classList.add('hidden');
+                document.getElementById('categoryArrow').style.transform = '';
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            const dd = document.getElementById('categoryDropdown');
+            if (dd && !dd.contains(e.target)) {
+                document.getElementById('categoryList').classList.add('hidden');
+                document.getElementById('categoryArrow').style.transform = '';
+            }
+        });
+
+        loadMyCollections();
+
+        // ── Preview Modal Logic ── //
+        function openPreviewModal(id) {
+            const item = currentLoadedCollections.find(c => c.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('previewModal');
+            const container = document.getElementById('mediaPreviewContainer');
+            const title = document.getElementById('previewTitle');
+            const cat = document.getElementById('previewCategory');
+            const catMobile = document.getElementById('previewCategoryMobile');
+            const date = document.getElementById('previewDate');
+            const creator = document.getElementById('previewCreator');
+            const desc = document.getElementById('previewDescription');
+            const fileBtn = document.getElementById('previewFileBtn');
+
+            title.textContent = item.title;
+            cat.textContent = item.category || 'Unknown Category';
+            catMobile.textContent = item.category || 'Unknown Category';
+            date.textContent = item.historical_date || '—';
+            creator.innerHTML = `<span class="material-symbols-outlined text-[14px] align-middle mr-1">person</span>${item.creator_name || 'Anonim'}`;
+            desc.textContent = (item.description || 'Tidak ada deskripsi.').replace(/\[Catatan Pribadi\]:\s*/g, 'Catatan Pribadi:\n');
+
+            // Dynamically build media preview
+            container.innerHTML = '';
+            if (item.file_url) {
+                const url = item.file_url;
+                const ext = url.split('?')[0].split('.').pop().toLowerCase();
+                
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'tiff', 'svg'].includes(ext)) {
+                    container.innerHTML = `<img src="${url}" class="max-w-full max-h-[50vh] md:max-h-[75vh] object-contain rounded-lg shadow-md" alt="${item.title}" />`;
+                } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
+                    container.innerHTML = `<video src="${url}" controls class="w-full max-h-[50vh] md:max-h-[75vh] rounded-lg shadow-md bg-black"></video>`;
+                } else if (['mp3', 'wav', 'ogg', 'aac'].includes(ext)) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center gap-4 w-full p-6">
+                            <span class="material-symbols-outlined text-6xl text-secondary animate-pulse">audiotrack</span>
+                            <audio src="${url}" controls class="w-full"></audio>
+                        </div>`;
+                } else if (ext === 'pdf') {
+                    container.innerHTML = `<iframe src="${url}" class="w-full h-[50vh] md:h-[70vh] rounded-lg border shadow-sm"></iframe>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center gap-2 text-stone-400">
+                            <span class="material-symbols-outlined text-6xl">description</span>
+                            <span class="text-sm font-medium">Dokumen (${ext.toUpperCase()})</span>
+                        </div>`;
+                }
+                
+                fileBtn.href = url;
+                fileBtn.classList.remove('hidden');
+                fileBtn.setAttribute('target', '_blank');
+            } else if (item.thumbnail_url) {
+                container.innerHTML = `<img src="${item.thumbnail_url}" class="max-w-full max-h-[50vh] md:max-h-[75vh] object-contain rounded-lg shadow-md" alt="${item.title}" />`;
+                fileBtn.classList.add('hidden');
+                fileBtn.removeAttribute('href');
+            } else {
+                container.innerHTML = `
+                    <div class="text-stone-400 flex flex-col items-center">
+                        <span class="material-symbols-outlined text-6xl mb-2">image_not_supported</span>
+                        <span class="text-sm">No Preview Available</span>
+                    </div>`;
+                fileBtn.classList.add('hidden');
+                fileBtn.removeAttribute('href');
+            }
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById('previewModal');
+            const container = document.getElementById('mediaPreviewContainer');
+            container.innerHTML = '';
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Close preview modal on click outside
+        document.getElementById('previewModal').addEventListener('click', function (e) {
+            if (e.target === this || e.target.classList.contains('modal-backdrop')) {
+                closePreviewModal();
+            }
+        });
+    </script>
+
+    <!-- Preview Modal HTML -->
+    <div id="previewModal"
+        class="fixed inset-0 z-[100] bg-on-surface/60 backdrop-blur-sm hidden flex items-center justify-center p-4 sm:p-6 overflow-y-auto modal-backdrop transition-opacity duration-300">
+        <div
+            class="bg-surface w-full max-w-4xl max-h-[90vh] shadow-2xl rounded-2xl relative overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 scale-100">
+
+            <!-- Image / Media Section -->
+            <div class="w-full md:w-1/2 bg-surface-container-lowest flex items-center justify-center relative border-b md:border-b-0 md:border-r border-outline-variant/30 min-h-[300px] p-4">
+                <div id="mediaPreviewContainer" class="w-full h-full flex items-center justify-center">
+                    <!-- Dynamically populated media goes here -->
+                </div>
+
+                <button onclick="closePreviewModal()"
+                    class="absolute top-4 left-4 bg-surface/50 hover:bg-surface p-2 rounded-full text-on-surface-variant backdrop-blur-md transition-all shadow-sm md:hidden z-10">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Content Section -->
+            <div class="w-full md:w-1/2 flex flex-col h-full max-h-[50vh] md:max-h-[90vh]">
+                <div class="p-6 md:p-10 flex-grow overflow-y-auto" style="scrollbar-width: thin;">
+                    <div class="flex justify-between items-start mb-6 hidden md:flex">
+                        <span id="previewCategory"
+                            class="text-xs font-bold uppercase tracking-[0.2em] text-secondary bg-secondary-container/50 px-3 py-1 rounded-full">Kategori</span>
+                        <button onclick="closePreviewModal()"
+                            class="text-on-surface-variant hover:text-error transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="md:hidden mb-4">
+                        <span id="previewCategoryMobile"
+                            class="text-xs font-bold uppercase tracking-[0.2em] text-secondary bg-secondary-container/50 px-3 py-1 rounded-full">Kategori</span>
+                    </div>
+
+                    <h2 id="previewTitle" class="text-3xl font-headline font-bold text-primary mb-4 leading-tight">
+                        Artifact Title</h2>
+
+                    <div
+                        class="flex flex-wrap items-center gap-4 mb-8 text-sm text-on-surface-variant border-b border-outline-variant/20 pb-6">
+                        <div class="flex items-center gap-1.5" title="Historical Date">
+                            <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                            <span id="previewDate" class="font-medium">1920-01-01</span>
+                        </div>
+                        <div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+                        <div id="previewCreator" class="font-medium text-secondary flex items-center"
+                            title="Creator / Owner">
+                            Unknown Creator
+                        </div>
+                    </div>
+
+                    <div class="prose prose-sm prose-stone">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-outline mb-3">Deskripsi Arsip</h3>
+                        <p id="previewDescription" class="text-on-surface leading-relaxed whitespace-pre-wrap">
+                            Description goes here...</p>
+                    </div>
+                </div>
+
+                <!-- Footer Action -->
+                <div class="p-6 bg-surface-container-lowest border-t border-outline-variant/20 shrink-0">
+                    <a id="previewFileBtn" href="#"
+                        class="w-full bg-primary text-on-primary py-3.5 rounded-lg text-sm font-bold tracking-wide shadow-md hover:bg-primary-container transition-colors items-center justify-center gap-2 flex"
+                        download>
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Lihat / Unduh Arsip Asli
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

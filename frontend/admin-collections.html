@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lobo Palu | Archive Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#fbfbe2", "surface-container": "#efefd7",
+              "primary-container": "#800000", "secondary-container": "#fed65b",
+              "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+              "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+              "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+              "outline": "#8e706c", "surface-variant": "#e4e4cc",
+              "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+              "tertiary": "#262727", "secondary": "#735c00",
+              "surface-container-high": "#eaead1",
+              "surface-container-highest": "#e4e4cc",
+              "surface-container-lowest": "#ffffff",
+              "primary": "#570000", "on-primary-container": "#ff8371",
+              "error-container": "#ffdad6",
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .batik-overlay { opacity: 0.03; mix-blend-mode: multiply; }
+        .toast { position: fixed; top: 24px; right: 24px; z-index: 9999; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: #166534; color: #fff; }
+        .toast-error { background: #991b1b; color: #fff; }
+        .nav-link { transition: all 0.4s ease-in-out; }
+        .nav-link:hover { transform: translateX(4px); }
+        .nav-active { background: rgba(231,229,228,0.5); color: #7f1d1d; border-right: 4px solid #d97706; }
+        .modal-backdrop { transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen" data-sidebar="open">
+    <style>
+        /* Responsive Sidebar Styles */
+        body[data-sidebar="open"] #sidebar { transform: translateX(0); }
+        body[data-sidebar="closed"] #sidebar { transform: translateX(-100%); }
+        
+        @media (min-width: 768px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 18rem; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 18rem; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 0; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 0; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+
+        /* Mobile Overlay */
+        #mobileOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 35;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mobileOverlay { display: block; }
+        }
+    </style>
+<div id="toast" class="toast"></div>
+
+<!-- Mobile Overlay -->
+<div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar Navigation -->
+<nav id="sidebar" class="h-screen w-72 fixed left-0 top-0 border-r border-stone-200/30 bg-stone-100/80 backdrop-blur-2xl shadow-[20px_0_40px_rgba(27,29,14,0.04)] flex flex-col py-8 px-4 gap-6 z-40 transition-transform duration-300">
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col gap-1">
+            <h1 class="text-2xl font-serif font-black text-red-950 italic">Lobo Palu</h1>
+            <p class="font-serif text-sm tracking-wide text-stone-500">Digital Curator</p>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden p-2 bg-stone-200/50 hover:bg-stone-300 text-stone-600 hover:text-primary rounded-lg transition-all focus:outline-none" title="Tutup Menu">
+            <span class="material-symbols-outlined text-xl">menu_open</span>
+        </button>
+    </div>
+    <div class="flex flex-col gap-2 flex-grow">
+        <a class="nav-link flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-200/30" href="admin-dashboard.html">
+            <span class="material-symbols-outlined">home</span><span class="font-serif text-sm tracking-wide">Dashboard</span>
+        </a>
+        <a class="nav-link nav-active flex items-center gap-3 px-4 py-3" href="admin-collections.html">
+            <span class="material-symbols-outlined">library_books</span><span class="font-serif text-sm tracking-wide">Collections</span>
+        </a>
+        <a class="nav-link flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-200/30" href="admin-users.html">
+            <span class="material-symbols-outlined">admin_panel_settings</span><span class="font-serif text-sm tracking-wide">User Monitoring</span>
+        </a>
+        <a class="nav-link flex items-center gap-3 px-4 py-3 text-stone-500 hover:bg-stone-200/30" href="user-portal.html">
+            <span class="material-symbols-outlined">person</span><span class="font-serif text-sm tracking-wide">Profile</span>
+        </a>
+    </div>
+    <button onclick="openModal()" class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-4 rounded-md font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 mb-6">
+        <span class="material-symbols-outlined">add_circle</span> Create Archive
+    </button>
+    <div class="flex flex-col gap-2 pt-6 border-t border-stone-200/30">
+        <a class="nav-link flex items-center gap-3 px-4 py-2 text-stone-500 hover:bg-stone-200/30" href="#" onclick="logout()">
+            <span class="material-symbols-outlined">logout</span><span class="font-serif text-sm tracking-wide">Logout</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Top App Bar -->
+<header id="topHeader" class="fixed top-0 right-0 z-40 h-20 px-4 md:px-8 flex justify-between items-center bg-stone-50/70 backdrop-blur-xl shadow-sm bg-gradient-to-b from-stone-200/20 to-transparent transition-all duration-300">
+    <div class="flex items-center gap-4">
+        <button onclick="toggleSidebar()" class="w-10 h-10 bg-white border border-stone-200/50 rounded-full shadow-sm text-stone-600 hover:text-primary hover:border-primary/30 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-0 group" title="Toggle Menu">
+            <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110" id="sidebarIcon">menu_open</span>
+        </button>
+        <h2 class="font-serif text-xl font-bold tracking-tight text-stone-900 hidden md:block">Archive Management</h2>
+    </div>
+    <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4">
+            <div class="md:flex flex-col items-end pr-2 hidden">
+                <span id="headerUserName" class="text-sm font-medium text-on-surface leading-tight"></span>
+                <span class="text-[9px] font-bold text-stone-700 tracking-widest uppercase bg-stone-200 border border-stone-300 px-2 py-0.5 rounded mt-0.5 shadow-sm">Admin</span>
+            </div>
+            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-secondary/20 hover:border-secondary transition-colors cursor-pointer bg-stone-300 flex items-center justify-center">
+                <span class="material-symbols-outlined text-stone-600">person</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content Canvas -->
+<main id="mainContent" class="pt-28 pb-20 px-6 md:px-12 relative overflow-hidden min-h-screen transition-all duration-300">
+    <div class="absolute inset-0 batik-overlay pointer-events-none"></div>
+    <!-- Section Title -->
+    <div class="flex flex-col items-center mb-10 md:mb-16 text-center">
+        <div class="flex items-center w-full gap-4 md:gap-8">
+            <div class="h-px flex-grow bg-gradient-to-r from-transparent via-secondary/40 to-secondary/10"></div>
+            <h3 class="font-headline text-xs md:text-sm uppercase tracking-[0.3em] text-secondary font-bold">Registry of Artifacts</h3>
+            <div class="h-px flex-grow bg-gradient-to-l from-transparent via-secondary/40 to-secondary/10"></div>
+        </div>
+        <h1 class="font-headline text-3xl md:text-5xl text-primary mt-4 md:mt-6 tracking-tight leading-tight">Digital Collection Management</h1>
+    </div>
+
+    <!-- Management Controls -->
+    <div class="flex flex-col md:flex-row justify-between items-stretch md:items-end gap-6 md:gap-0 mb-8 md:mb-10 w-full">
+        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <div class="flex flex-col gap-2 w-full md:w-auto">
+                <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Category Filter</label>
+                <input type="hidden" id="filterCategory" value="All Assets"/>
+                <div class="relative w-full" id="filterCatDD">
+                    <button type="button" onclick="toggleFilterDD()" class="w-full bg-surface-container-low border-none border-b border-outline-variant/30 text-sm py-2 px-4 pr-10 text-left flex items-center justify-between gap-4 md:min-w-[180px]">
+                        <span id="filterCatLabel">All Assets</span>
+                        <span class="material-symbols-outlined text-lg text-outline transition-transform" id="filterCatArrow">expand_more</span>
+                    </button>
+                    <div id="filterCatList" class="hidden absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg shadow-xl z-30 overflow-hidden">
+                        <div class="max-h-[144px] overflow-y-auto" style="scrollbar-width: thin;">
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors bg-surface-container-high font-medium" data-val="All Assets">All Assets</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Photography">Photography</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cinematography">Cinematography</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Manuscript">Manuscript</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Oral History">Oral History</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Textile">Textile</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Audio Record">Audio Record</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Video">Video</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Artifact">Artifact</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Lukisan">Lukisan</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Tari">Tari</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cerpen">Cerpen</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Puisi">Puisi</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Teater">Teater</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Musik Tradisional">Musik Tradisional</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Kerajinan">Kerajinan</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Ritual">Ritual</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cerita Rakyat">Cerita Rakyat</div>
+                            <div class="fcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Arsitektur Tradisional">Arsitektur Tradisional</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 w-full md:w-auto">
+                <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Sort By</label>
+                <select id="sortBy" onchange="loadCollections(1)" class="w-full md:w-auto bg-surface-container-low border-none border-b border-outline-variant/30 text-sm focus:ring-0 focus:border-secondary py-2 px-4 pr-10">
+                    <option value="created_at">Date Added</option>
+                    <option value="title">Alphabetical</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="openModal()" class="group flex items-center justify-center gap-3 bg-surface-container-high hover:bg-primary hover:text-on-primary transition-all duration-500 px-8 py-4 rounded-md border border-outline-variant/10 shadow-sm w-full md:w-auto mt-4 md:mt-0">
+            <span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-500">add</span>
+            <span class="font-label font-semibold tracking-wide">Register New Artifact</span>
+        </button>
+    </div>
+
+    <!-- Digital Archive Table -->
+    <div class="relative bg-surface-container-low/50 backdrop-blur-sm rounded-xl border border-outline-variant/5 shadow-xl overflow-x-auto">
+        <table class="w-full min-w-[800px] text-left border-collapse">
+            <thead>
+                <tr class="bg-surface-container text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+                    <th class="px-8 py-5">Preview</th>
+                    <th class="px-6 py-5">Nomenclature & Identity</th>
+                    <th class="px-6 py-5">Classification</th>
+                    <th class="px-6 py-5">User</th> <!-- Kolom Baru -->
+                    <th class="px-6 py-5">Curation Date</th>
+                    <th class="px-6 py-5 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="collectionsTableBody" class="divide-y divide-surface-container-high">
+                <tr>
+                    <td colspan="6" class="px-8 py-12 text-center text-stone-400"> <!-- Colspan diubah ke 6 -->
+                        <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                        <p class="text-sm">Memuat koleksi...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex justify-between items-center text-on-surface-variant">
+        <p id="paginationInfo" class="text-xs uppercase tracking-widest font-medium">—</p>
+        <div id="paginationControls" class="flex gap-2"></div>
+    </div>
+</main>
+
+<!-- Modal Form -->
+<div id="modalOverlay" class="fixed inset-0 z-[100] bg-on-surface/40 backdrop-blur-md flex items-center justify-center p-4 md:p-6 hidden overflow-y-auto modal-backdrop">
+    <div class="bg-surface max-w-2xl w-full shadow-2xl relative border-t-8 border-primary overflow-hidden modal-content">
+        <div class="absolute top-0 right-0 p-6">
+            <button onclick="closeModal()" class="text-stone-400 hover:text-on-surface transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="artifactForm" class="p-6 md:p-12" onsubmit="handleArtifactSubmit(event)">
+            <input type="hidden" id="editId" value="" />
+            <header class="mb-10 text-center">
+                <h2 id="modalTitle" class="font-headline text-3xl text-primary font-bold">New Archive Registration</h2>
+                <p class="text-on-surface-variant font-serif italic mt-2">Enter the formal specifications of the artifact</p>
+            </header>
+            <div class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <div class="relative col-span-2 md:col-span-1">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-2" for="artifact_name">Artifact Nomenclature</label>
+                        <input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 focus:ring-0 focus:border-secondary transition-all" id="artifact_name" placeholder="Enter artifact title..." type="text" required/>
+                    </div>
+                    <div class="relative col-span-2 md:col-span-1">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-2" for="artifact_creator">Creator / Owner</label>
+                        <input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 focus:ring-0 focus:border-secondary transition-all" id="artifact_creator" placeholder="Enter creator or owner name..." type="text"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Digital Classification</label>
+                        <input type="hidden" id="artifact_category" value="" required/>
+                        <div class="relative" id="modalCatDD">
+                            <button type="button" onclick="toggleModalDD()" class="w-full bg-surface-container-low border-none border-b border-outline-variant/30 text-sm py-3 px-0 text-left flex items-center justify-between">
+                                <span id="modalCatLabel" class="text-on-surface-variant">Select Category...</span>
+                                <span class="material-symbols-outlined text-lg text-outline transition-transform" id="modalCatArrow">expand_more</span>
+                            </button>
+                            <div id="modalCatList" class="hidden absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg shadow-xl z-30 overflow-hidden">
+                                <div class="max-h-[144px] overflow-y-auto" style="scrollbar-width: thin;">
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Photography">Photography</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cinematography">Cinematography</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Manuscript">Manuscript</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Oral History">Oral History</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Textile">Textile</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Audio Record">Audio Record</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Video">Video</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Artifact">Artifact</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Lukisan">Lukisan</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Tari">Tari</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cerpen">Cerpen</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Puisi">Puisi</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Teater">Teater</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Musik Tradisional">Musik Tradisional</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Kerajinan">Kerajinan</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Ritual">Ritual</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Cerita Rakyat">Cerita Rakyat</div>
+                                    <div class="mcat-opt px-4 py-2.5 text-sm cursor-pointer hover:bg-surface-container-high transition-colors" data-val="Arsitektur Tradisional">Arsitektur Tradisional</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Historical Date</label>
+                        <input id="artifact_date" class="bg-transparent border-0 border-b border-outline-variant/30 text-sm focus:ring-0 focus:border-secondary py-3" placeholder="e.g. 1920, Oct 2023" type="text"/>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">Archive Source</label>
+                    <label id="fileLabel" class="flex items-center gap-3 bg-surface-container-low px-4 py-3 border border-dashed border-outline-variant cursor-pointer hover:bg-surface-container transition-colors">
+                        <span class="material-symbols-outlined text-secondary">upload_file</span>
+                        <span class="text-xs text-on-surface-variant font-medium">Choose digital file...</span>
+                        <input id="artifact_file" type="file" class="hidden" onchange="handleFileSelect(this)"/>
+                    </label>
+                    <div id="fileInfo" class="text-[10px] text-stone-400 mt-1 hidden items-center gap-1.5">
+                        <span id="fileNameText"></span>
+                        <button type="button" onclick="clearFileSelection()" class="inline-flex items-center justify-center p-0.5 rounded-full hover:bg-stone-200 text-error hover:text-red-700 transition-colors" title="Remove file">
+                            <span class="material-symbols-outlined text-xs leading-none">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-2" for="artifact_description">Historical Narration & Context</label>
+                    <textarea class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 focus:ring-0 focus:border-secondary transition-all resize-none" id="artifact_description" placeholder="Describe the artifact's significance..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="mt-12 flex gap-4">
+                <button id="submitBtn" class="flex-grow bg-primary text-on-primary py-4 font-bold uppercase tracking-[0.2em] text-sm shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+                    <span id="submitBtnText">Commit to Digital Vault</span>
+                    <span id="submitSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                </button>
+                <button onclick="closeModal()" class="px-8 border border-outline-variant/30 text-stone-500 hover:bg-stone-100 transition-all font-bold uppercase tracking-[0.2em] text-sm" type="button">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Preview Modal HTML -->
+<div id="previewModal" class="fixed inset-0 z-[100] bg-on-surface/60 backdrop-blur-md hidden flex items-center justify-center p-4 sm:p-6 overflow-y-auto modal-backdrop transition-opacity duration-300">
+    <div class="bg-surface w-full max-w-4xl max-h-[90vh] shadow-2xl rounded-2xl relative overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 scale-100">
+        
+        <!-- Media Preview Section -->
+        <div class="w-full md:w-1/2 bg-surface-container-lowest flex items-center justify-center relative border-b md:border-b-0 md:border-r border-outline-variant/30 min-h-[300px] p-4">
+            <div id="mediaPreviewContainer" class="w-full h-full flex items-center justify-center">
+                <!-- Dynamically populated media goes here -->
+            </div>
+            
+            <button onclick="closePreviewModal()" class="absolute top-4 left-4 bg-surface/50 hover:bg-surface p-2 rounded-full text-on-surface-variant backdrop-blur-md transition-all shadow-sm md:hidden z-10">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Curation Details Section -->
+        <div class="w-full md:w-1/2 flex flex-col h-full max-h-[50vh] md:max-h-[90vh]">
+            <div class="p-6 md:p-10 flex-grow overflow-y-auto" style="scrollbar-width: thin;">
+                <div class="flex justify-between items-start mb-6 hidden md:flex">
+                    <span id="previewCategory" class="text-xs font-bold uppercase tracking-[0.2em] text-secondary bg-secondary-container/50 px-3 py-1 rounded-full">Category</span>
+                    <button onclick="closePreviewModal()" class="text-on-surface-variant hover:text-error transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="md:hidden mb-4">
+                    <span id="previewCategoryMobile" class="text-xs font-bold uppercase tracking-[0.2em] text-secondary bg-secondary-container/50 px-3 py-1 rounded-full">Category</span>
+                </div>
+
+                <h2 id="previewTitle" class="text-3xl font-headline font-bold text-primary mb-4 leading-tight">Artifact Title</h2>
+
+                <div class="flex flex-wrap items-center gap-4 mb-8 text-sm text-on-surface-variant border-b border-outline-variant/20 pb-6">
+                    <div class="flex items-center gap-1.5" title="Historical Date">
+                        <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                        <span id="previewDate" class="font-medium">Date</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+                    <div id="previewCreator" class="font-medium text-secondary flex items-center" title="Creator / Owner">
+                        Unknown Creator
+                    </div>
+                </div>
+
+                <div class="prose prose-sm prose-stone">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-outline mb-3">Narration & Context</h3>
+                    <p id="previewDescription" class="text-on-surface leading-relaxed whitespace-pre-wrap">Description goes here...</p>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="p-6 bg-surface-container-lowest border-t border-outline-variant/20 shrink-0">
+                <a id="previewFileBtn" href="#" class="w-full bg-primary text-on-primary py-3.5 rounded-lg text-sm font-bold tracking-wide shadow-md hover:bg-primary-container transition-colors items-center justify-center gap-2 flex" download>
+                    <span class="material-symbols-outlined text-[18px]">download</span>
+                    Open / Download Original File
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    // Auth guard
+    if (typeof requireAuth === 'function' && !requireAuth()) { /* redirected */ }
+    if (typeof requireAdmin === 'function' && !requireAdmin()) { /* redirected */ }
+
+    let currentPage = 1;
+    let selectedFile = null;
+    let currentLoadedCollections = [];
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type} show`;
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    // Mobile Responsiveness Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.innerWidth < 768) {
+            document.body.setAttribute('data-sidebar', 'closed');
+            const icon = document.getElementById('sidebarIcon');
+            if (icon) icon.textContent = 'menu';
+        }
+    });
+
+    // Sidebar Toggle Logic
+    function toggleSidebar() {
+        const body = document.body;
+        const icon = document.getElementById('sidebarIcon');
+        
+        if (body.getAttribute('data-sidebar') === 'open') {
+            body.setAttribute('data-sidebar', 'closed');
+            if (icon) icon.textContent = 'menu';
+        } else {
+            body.setAttribute('data-sidebar', 'open');
+            if (icon) icon.textContent = 'menu_open';
+        }
+    }
+
+    function openModal(editData = null) {
+        const modal = document.getElementById('modalOverlay');
+        modal.classList.remove('hidden');
+        if (editData) {
+            document.getElementById('modalTitle').textContent = 'Edit Archive Entry';
+            document.getElementById('editId').value = editData.id;
+            document.getElementById('artifact_name').value = editData.title || '';
+            document.getElementById('artifact_creator').value = editData.creator_name || '';
+            document.getElementById('artifact_category').value = editData.category || '';
+            document.getElementById('modalCatLabel').textContent = editData.category || 'Select Category...';
+            document.getElementById('artifact_date').value = editData.historical_date || '';
+            document.getElementById('artifact_description').value = editData.description || '';
+            document.getElementById('submitBtnText').textContent = 'Update Archive';
+            // highlight active option
+            document.querySelectorAll('.mcat-opt').forEach(o => {
+                o.classList.remove('bg-surface-container-high', 'font-medium');
+                if (o.dataset.val === editData.category) o.classList.add('bg-surface-container-high', 'font-medium');
+            });
+        } else {
+            document.getElementById('modalTitle').textContent = 'New Archive Registration';
+            document.getElementById('editId').value = '';
+            document.getElementById('artifact_name').value = '';
+            document.getElementById('artifact_creator').value = '';
+            document.getElementById('artifact_category').value = '';
+            document.getElementById('modalCatLabel').textContent = 'Select Category...';
+            document.getElementById('artifact_date').value = '';
+            document.getElementById('artifact_description').value = '';
+            document.getElementById('submitBtnText').textContent = 'Commit to Digital Vault';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.querySelectorAll('.mcat-opt').forEach(o => o.classList.remove('bg-surface-container-high', 'font-medium'));
+        }
+        selectedFile = null;
+        document.getElementById('fileInfo').classList.add('hidden');
+        document.getElementById('artifact_file').value = '';
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.add('hidden');
+    }
+
+    function clearFileSelection() {
+        selectedFile = null;
+        document.getElementById('artifact_file').value = '';
+        document.getElementById('fileInfo').classList.add('hidden');
+    }
+
+    function openPreviewModal(id) {
+        const item = currentLoadedCollections.find(c => c.id === id);
+        if (!item) return;
+
+        const modal = document.getElementById('previewModal');
+        const container = document.getElementById('mediaPreviewContainer');
+        const title = document.getElementById('previewTitle');
+        const cat = document.getElementById('previewCategory');
+        const catMobile = document.getElementById('previewCategoryMobile');
+        const date = document.getElementById('previewDate');
+        const creator = document.getElementById('previewCreator');
+        const desc = document.getElementById('previewDescription');
+        const fileBtn = document.getElementById('previewFileBtn');
+
+        title.textContent = item.title;
+        cat.textContent = item.category || 'Unknown Category';
+        catMobile.textContent = item.category || 'Unknown Category';
+        date.textContent = item.historical_date || '—';
+        creator.innerHTML = `<span class="material-symbols-outlined text-[14px] align-middle mr-1">person</span>${item.creator_name || 'Anonim'}`;
+        desc.textContent = (item.description || 'Tidak ada deskripsi.').replace(/\[Catatan Pribadi\]:\s*/g, 'Catatan Pribadi:\n');
+
+        // Dynamically build media preview
+        container.innerHTML = '';
+        if (item.file_url) {
+            const url = item.file_url;
+            const ext = url.split('?')[0].split('.').pop().toLowerCase();
+            
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'tiff', 'svg'].includes(ext)) {
+                container.innerHTML = `<img src="${url}" class="max-w-full max-h-[50vh] md:max-h-[75vh] object-contain rounded-lg shadow-md" alt="${item.title}" />`;
+            } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
+                container.innerHTML = `<video src="${url}" controls class="w-full max-h-[50vh] md:max-h-[75vh] rounded-lg shadow-md bg-black"></video>`;
+            } else if (['mp3', 'wav', 'ogg', 'aac'].includes(ext)) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center gap-4 w-full p-6">
+                        <span class="material-symbols-outlined text-6xl text-secondary animate-pulse">audiotrack</span>
+                        <audio src="${url}" controls class="w-full"></audio>
+                    </div>`;
+            } else if (ext === 'pdf') {
+                container.innerHTML = `<iframe src="${url}" class="w-full h-[50vh] md:h-[70vh] rounded-lg border shadow-sm"></iframe>`;
+            } else {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center gap-2 text-stone-400">
+                        <span class="material-symbols-outlined text-6xl">description</span>
+                        <span class="text-sm font-medium">Dokumen (${ext.toUpperCase()})</span>
+                    </div>`;
+            }
+            
+            fileBtn.href = url;
+            fileBtn.classList.remove('hidden');
+            fileBtn.setAttribute('target', '_blank');
+        } else if (item.thumbnail_url) {
+            container.innerHTML = `<img src="${item.thumbnail_url}" class="max-w-full max-h-[50vh] md:max-h-[75vh] object-contain rounded-lg shadow-md" alt="${item.title}" />`;
+            fileBtn.classList.add('hidden');
+            fileBtn.removeAttribute('href');
+        } else {
+            container.innerHTML = `
+                <div class="text-stone-400 flex flex-col items-center">
+                    <span class="material-symbols-outlined text-6xl mb-2">image_not_supported</span>
+                    <span class="text-sm">No Preview Available</span>
+                </div>`;
+            fileBtn.classList.add('hidden');
+            fileBtn.removeAttribute('href');
+        }
+
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        const container = document.getElementById('mediaPreviewContainer');
+        container.innerHTML = '';
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            selectedFile = input.files[0];
+            document.getElementById('fileNameText').textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('fileInfo').classList.add('flex');
+        }
+    }
+
+    // ── Load collections ──
+    async function loadCollections(page = 1) {
+        currentPage = page;
+        const category = document.getElementById('filterCategory').value;
+        const sortBy = document.getElementById('sortBy').value;
+
+        try {
+            const result = await apiGetCollections({
+                page, limit: 12,
+                category: category !== 'All Assets' ? category : undefined,
+                sort_by: sortBy, sort_order: 'desc',
+            });
+            currentLoadedCollections = result.data || [];
+
+            renderTable(currentLoadedCollections);
+            renderPagination(result.total || 0, result.page || 1, result.total_pages || 0, result.limit || 12);
+        } catch (err) {
+            console.error('Load error:', err);
+            showToast('Gagal memuat koleksi', 'error');
+        }
+    }
+
+    function getCategoryBadge(category) {
+        const styles = {
+            'Photography': 'bg-secondary/10 text-secondary border-secondary/20',
+            'Manuscript': 'bg-stone-200 text-tertiary border-tertiary/20',
+            'Video': 'bg-red-900/10 text-primary-container border-primary-container/20',
+            'Cinematography': 'bg-red-900/10 text-primary-container border-primary-container/20',
+            'Oral History': 'bg-amber-100 text-amber-800 border-amber-300/30',
+            'Textile': 'bg-green-100 text-green-800 border-green-300/30',
+            'Audio Record': 'bg-blue-100 text-blue-800 border-blue-300/30',
+            'Artifact': 'bg-purple-100 text-purple-800 border-purple-300/30',
+            'Lukisan': 'bg-indigo-100 text-indigo-800 border-indigo-300/30',
+            'Tari': 'bg-pink-100 text-pink-800 border-pink-300/30',
+            'Cerpen': 'bg-cyan-100 text-cyan-800 border-cyan-300/30',
+            'Puisi': 'bg-rose-100 text-rose-800 border-rose-300/30',
+            'Teater': 'bg-orange-100 text-orange-800 border-orange-300/30',
+            'Musik Tradisional': 'bg-teal-100 text-teal-800 border-teal-300/30',
+            'Kerajinan': 'bg-lime-100 text-lime-800 border-lime-300/30',
+            'Ritual': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300/30',
+            'Cerita Rakyat': 'bg-yellow-100 text-yellow-800 border-yellow-300/30',
+            'Arsitektur Tradisional': 'bg-emerald-100 text-emerald-800 border-emerald-300/30',
+        };
+        const style = styles[category] || 'bg-stone-100 text-stone-600 border-stone-200';
+        return `<span class="px-3 py-1 ${style} text-[10px] uppercase tracking-widest font-bold border rounded">${category}</span>`;
+    }
+
+    // Fungsi Render Table (Diperbarui dengan kolom User dan colspan 6)
+    function renderTable(items) {
+        const tbody = document.getElementById('collectionsTableBody');
+        
+        // Pastikan colspan diubah menjadi 6 saat data sedang kosong/loading
+        if (!items || items.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-12 text-center text-stone-400"><span class="material-symbols-outlined text-4xl mb-4 block">inventory_2</span><p class="text-sm">Belum ada koleksi. Klik "Register New Artifact" untuk memulai.</p></td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = items.map(item => `
+            <tr class="group hover:bg-surface-container-highest/30 transition-colors duration-300">
+                
+                <!-- Kolom 1: Preview -->
+                <td class="px-8 py-6">
+                    <div class="h-16 w-24 overflow-hidden rounded shadow-md border border-secondary/10 bg-stone-200 flex items-center justify-center">
+                        ${item.thumbnail_url || item.file_url
+                            ? `<img alt="${item.title}" class="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="${item.thumbnail_url || item.file_url}"/>`
+                            : `<span class="material-symbols-outlined text-stone-400 text-2xl">image</span>`
+                        }
+                    </div>
+                </td>
+                
+                <!-- Kolom 2: Nomenclature & Identity -->
+                <td class="px-6 py-6">
+                    <div class="flex flex-col">
+                        <span class="font-headline text-lg text-primary font-bold">${item.title}</span>
+                        <span class="text-xs text-on-surface-variant mt-1 line-clamp-1">${item.description || '—'}</span>
+                    </div>
+                </td>
+                
+                <!-- Kolom 3: Classification -->
+                <td class="px-6 py-6">
+                    ${getCategoryBadge(item.category)}
+                </td>
+                
+                <!-- Kolom 4: User -->
+                <td class="px-6 py-6">
+                    <div class="flex items-center gap-2 text-sm">
+                        <div class="w-6 h-6 rounded-full bg-stone-300 flex items-center justify-center text-stone-600 shadow-sm border border-stone-400/20">
+                            <span class="material-symbols-outlined text-[14px]">person</span>
+                        </div>
+                        <span class="font-medium text-on-surface-variant">
+                            ${item.user_name || item.creator_name || 'Admin'}
+                        </span>
+                    </div>
+                </td>
+                
+                <!-- Kolom 5: Curation Date -->
+                <td class="px-6 py-6 text-sm text-on-surface-variant italic">
+                    ${typeof formatDate === 'function' ? formatDate(item.created_at) : (item.created_at || '—')}
+                </td>
+                
+                <!-- Kolom 6: Actions -->
+                <td class="px-6 py-6">
+                    <div class="flex justify-end gap-3">
+                        <button onclick="openPreviewModal('${item.id}')" class="p-2 text-on-surface-variant hover:text-secondary transition-colors" title="Preview">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                        <button onclick='openModal(${JSON.stringify(item).replace(/'/g, "\\'")})' class="p-2 text-on-surface-variant hover:text-secondary transition-colors" title="Edit">
+                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                        </button>
+                        <button onclick="handleDelete('${item.id}')" class="p-2 text-on-surface-variant hover:text-error transition-colors" title="Delete">
+                            <span class="material-symbols-outlined text-[20px]">delete_outline</span>
+                        </button>
+                    </div>
+                </td>
+                
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination(total, page, totalPages, limit) {
+        const start = total === 0 ? 0 : (page - 1) * limit + 1;
+        const end = Math.min(page * limit, total);
+        document.getElementById('paginationInfo').textContent = `Viewing ${start}-${end} of ${total} Entries`;
+
+        const controls = document.getElementById('paginationControls');
+        if (totalPages <= 1) { controls.innerHTML = ''; return; }
+
+        let html = '';
+        html += `<button onclick="loadCollections(${Math.max(1, page - 1)})" class="w-10 h-10 flex items-center justify-center border border-outline-variant/20 hover:bg-surface-container-high transition-colors" ${page <= 1 ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_left</span></button>`;
+
+        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+            html += `<button onclick="loadCollections(${i})" class="w-10 h-10 flex items-center justify-center ${i === page ? 'bg-primary text-on-primary' : 'border border-outline-variant/20 hover:bg-surface-container-high'} transition-colors">${i}</button>`;
+        }
+
+        html += `<button onclick="loadCollections(${Math.min(totalPages, page + 1)})" class="w-10 h-10 flex items-center justify-center border border-outline-variant/20 hover:bg-surface-container-high transition-colors" ${page >= totalPages ? 'disabled' : ''}><span class="material-symbols-outlined">chevron_right</span></button>`;
+        controls.innerHTML = html;
+    }
+
+    // ── Submit artifact ──
+    async function handleArtifactSubmit(e) {
+        e.preventDefault();
+        const editId = document.getElementById('editId').value;
+        const title = document.getElementById('artifact_name').value;
+        const creator_name = document.getElementById('artifact_creator').value;
+        const category = document.getElementById('artifact_category').value;
+        const description = document.getElementById('artifact_description').value;
+        const historicalDate = document.getElementById('artifact_date').value;
+
+        document.getElementById('submitBtnText').textContent = 'Processing...';
+        document.getElementById('submitSpinner').classList.remove('hidden');
+        document.getElementById('submitBtn').disabled = true;
+
+        try {
+            let fileUrl = '';
+            // Upload file first if selected
+            if (selectedFile) {
+                const uploadResult = await apiUploadFile(selectedFile);
+                fileUrl = uploadResult.url || '';
+            }
+
+            const data = { title, creator_name, category, description, historical_date: historicalDate };
+            if (fileUrl) {
+                data.file_url = fileUrl;
+                data.thumbnail_url = fileUrl;
+            }
+
+            if (editId) {
+                await apiUpdateCollection(editId, data);
+                showToast('Artifact updated successfully');
+            } else {
+                await apiCreateCollection(data);
+                showToast('Artifact registered successfully');
+            }
+
+            closeModal();
+            loadCollections(currentPage);
+        } catch (err) {
+            showToast(err.message || 'Operation failed', 'error');
+        } finally {
+            document.getElementById('submitBtnText').textContent = editId ? 'Update Archive' : 'Commit to Digital Vault';
+            document.getElementById('submitSpinner').classList.add('hidden');
+            document.getElementById('submitBtn').disabled = false;
+        }
+    }
+
+    // ── Delete artifact ──
+    async function handleDelete(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus artifact ini?')) return;
+        try {
+            await apiDeleteCollection(id);
+            showToast('Artifact deleted');
+            loadCollections(currentPage);
+        } catch (err) {
+            showToast(err.message || 'Delete failed', 'error');
+        }
+    }
+
+    // ── Custom Dropdown Handlers ──
+    function toggleFilterDD() {
+        const list = document.getElementById('filterCatList');
+        const arrow = document.getElementById('filterCatArrow');
+        list.classList.toggle('hidden');
+        arrow.style.transform = list.classList.contains('hidden') ? '' : 'rotate(180deg)';
+    }
+    function toggleModalDD() {
+        const list = document.getElementById('modalCatList');
+        const arrow = document.getElementById('modalCatArrow');
+        list.classList.toggle('hidden');
+        arrow.style.transform = list.classList.contains('hidden') ? '' : 'rotate(180deg)';
+    }
+
+    document.querySelectorAll('.fcat-opt').forEach(opt => {
+        opt.addEventListener('click', function() {
+            const val = this.dataset.val;
+            document.getElementById('filterCategory').value = val;
+            document.getElementById('filterCatLabel').textContent = val;
+            document.querySelectorAll('.fcat-opt').forEach(o => o.classList.remove('bg-surface-container-high', 'font-medium'));
+            this.classList.add('bg-surface-container-high', 'font-medium');
+            document.getElementById('filterCatList').classList.add('hidden');
+            document.getElementById('filterCatArrow').style.transform = '';
+            loadCollections(1);
+        });
+    });
+
+    document.querySelectorAll('.mcat-opt').forEach(opt => {
+        opt.addEventListener('click', function() {
+            const val = this.dataset.val;
+            document.getElementById('artifact_category').value = val;
+            document.getElementById('modalCatLabel').textContent = val;
+            document.getElementById('modalCatLabel').classList.remove('text-on-surface-variant');
+            document.querySelectorAll('.mcat-opt').forEach(o => o.classList.remove('bg-surface-container-high', 'font-medium'));
+            this.classList.add('bg-surface-container-high', 'font-medium');
+            document.getElementById('modalCatList').classList.add('hidden');
+            document.getElementById('modalCatArrow').style.transform = '';
+        });
+    });
+
+    document.addEventListener('click', function(e) {
+        const fdd = document.getElementById('filterCatDD');
+        if (fdd && !fdd.contains(e.target)) {
+            document.getElementById('filterCatList').classList.add('hidden');
+            document.getElementById('filterCatArrow').style.transform = '';
+        }
+        const mdd = document.getElementById('modalCatDD');
+        if (mdd && !mdd.contains(e.target)) {
+            document.getElementById('modalCatList').classList.add('hidden');
+            document.getElementById('modalCatArrow').style.transform = '';
+        }
+    });
+
+    // Initial load
+    loadCollections(1);
+</script>
+</body>
+</html>

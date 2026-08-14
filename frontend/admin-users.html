@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lobo Palu | User Monitoring</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#fbfbe2", "surface-container": "#efefd7",
+              "primary-container": "#800000", "secondary-container": "#fed65b",
+              "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+              "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+              "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+              "outline": "#8e706c", "surface-variant": "#e4e4cc",
+              "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+              "tertiary": "#262727", "secondary": "#735c00",
+              "surface-container-high": "#eaead1",
+              "surface-container-highest": "#e4e4cc",
+              "surface-container-lowest": "#ffffff",
+              "primary": "#570000", "on-primary-container": "#ff8371",
+              "on-tertiary-container": "#a8a6a6", "tertiary-container": "#3c3c3c",
+              "surface-dim": "#dbdcc3",
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .batik-overlay { opacity: 0.03; pointer-events: none; }
+        .glass-morphism { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .toast { position: fixed; top: 24px; right: 24px; z-index: 9999; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: #166534; color: #fff; }
+        .toast-error { background: #991b1b; color: #fff; }
+        .nav-link { transition: all 0.4s ease-in-out; }
+        .nav-link:hover { transform: translateX(4px); }
+        .nav-active { background: rgba(231,229,228,0.5); color: #7f1d1d; border-right: 4px solid #d97706; }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased" data-sidebar="open">
+    <style>
+        /* Responsive Sidebar Styles */
+        body[data-sidebar="open"] #sidebar { transform: translateX(0); }
+        body[data-sidebar="closed"] #sidebar { transform: translateX(-100%); }
+        
+        @media (min-width: 768px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 18rem; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 18rem; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 0; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 0; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+
+        /* Mobile Overlay */
+        #mobileOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 45;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mobileOverlay { display: block; }
+        }
+    </style>
+<div id="toast" class="toast"></div>
+
+<!-- Mobile Overlay -->
+<div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar Navigation -->
+<aside id="sidebar" class="h-screen w-72 fixed left-0 top-0 border-r border-stone-200/30 bg-stone-100/80 backdrop-blur-2xl shadow-[20px_0_40px_rgba(27,29,14,0.04)] z-50 flex flex-col py-8 px-4 gap-6 transition-transform duration-300">
+    <div class="flex items-start justify-between mb-4 relative">
+        <div class="flex flex-col items-center gap-2 w-full">
+            <div class="w-16 h-16 bg-primary-container rounded-lg flex items-center justify-center shadow-lg">
+                <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">museum</span>
+            </div>
+            <div class="text-center">
+                <h1 class="font-serif font-black text-red-950 text-xl tracking-tight">Lobo Palu</h1>
+                <p class="font-serif text-sm tracking-wide text-stone-500">Digital Curator</p>
+            </div>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden absolute right-0 top-0 p-2 bg-stone-200/50 hover:bg-stone-300 text-stone-600 hover:text-primary rounded-lg transition-all focus:outline-none" title="Tutup Menu">
+            <span class="material-symbols-outlined text-xl">menu_open</span>
+        </button>
+    </div>
+    <nav class="flex-1 flex flex-col gap-1">
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="admin-dashboard.html">
+            <span class="material-symbols-outlined">home</span><span>Dashboard</span>
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="admin-collections.html">
+            <span class="material-symbols-outlined">library_books</span><span>Collections</span>
+        </a>
+        <a class="nav-link nav-active flex items-center gap-4 px-4 py-3 font-serif text-sm tracking-wide" href="admin-users.html">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span><span>User Monitoring</span>
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="user-portal.html">
+            <span class="material-symbols-outlined">person</span><span>Profile</span>
+        </a>
+    </nav>
+    <div class="mt-auto flex flex-col gap-1 border-t border-stone-200/30 pt-4">
+        <a href="admin-collections.html" class="w-full bg-primary bg-gradient-to-br from-primary to-primary-container text-on-primary py-3 rounded-md font-serif text-sm tracking-wider mb-4 hover:shadow-lg active:scale-95 transition-all text-center block">
+            Create Archive
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="#" onclick="logout()">
+            <span class="material-symbols-outlined">logout</span><span>Logout</span>
+        </a>
+    </div>
+</aside>
+
+<!-- Main Content Area -->
+<main id="mainContent" class="pt-28 px-4 md:px-12 pb-12 min-h-screen relative transition-all duration-300">
+    <div class="batik-overlay fixed inset-0"></div>
+    <!-- Top App Bar -->
+    <header id="topHeader" class="fixed top-0 right-0 z-40 bg-stone-50/70 backdrop-blur-xl shadow-sm h-20 px-4 md:px-8 flex justify-between items-center bg-gradient-to-b from-stone-200/20 to-transparent transition-all duration-300">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="w-10 h-10 bg-white border border-stone-200/50 rounded-full shadow-sm text-stone-600 hover:text-primary hover:border-primary/30 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-0 group" title="Toggle Menu">
+                <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110" id="sidebarIcon">menu_open</span>
+            </button>
+            <h2 class="font-headline font-bold italic text-2xl text-red-900 tracking-tight hidden md:block">Lobo Palu</h2>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="md:flex flex-col items-end pr-2 hidden">
+                    <span id="headerUserName" class="text-sm font-medium text-on-surface leading-tight"></span>
+                    <span class="text-[9px] font-bold text-stone-700 tracking-widest uppercase bg-stone-200 border border-stone-300 px-2 py-0.5 rounded mt-0.5 shadow-sm">Admin</span>
+                </div>
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-secondary/20 hover:border-secondary transition-colors cursor-pointer bg-stone-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-stone-600">person</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Canvas -->
+    <div class="pt-24 md:pt-32 pb-12 md:pb-20 px-6 md:px-12">
+        <!-- Welcome Header -->
+        <div class="mb-8 md:mb-12">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="h-px bg-secondary w-12"></div>
+                <span class="text-secondary font-label text-xs tracking-[0.2em] uppercase">User Monitoring System</span>
+            </div>
+            <h1 class="font-headline text-4xl md:text-5xl font-bold text-tertiary mb-4 leading-tight">Curator Account <br/><span class="text-primary italic">Management & Monitoring</span></h1>
+        </div>
+
+        <!-- Users Section -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(27,29,14,0.04)] overflow-hidden">
+            <div class="px-6 md:px-8 py-6 border-b border-stone-100 flex justify-between items-center text-center md:text-left">
+                <h3 class="font-headline text-lg font-bold text-on-surface">Registry of Active Curators</h3>
+            </div>
+            <div id="usersListContainer" class="divide-y divide-stone-50">
+                <!-- Rows dynamically loaded -->
+                <div class="px-8 py-12 text-center text-stone-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                    <p class="text-sm">Memuat data pengguna...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="px-12 py-12 border-t border-stone-200/30 flex justify-between items-center relative z-10">
+        <p class="text-xs font-label text-stone-400 tracking-wider">© 2024 Arsip Digital Komunitas Seni Lobo Palu. All Rights Reserved.</p>
+        <div class="flex gap-8">
+            <a class="text-xs font-bold text-secondary tracking-widest uppercase hover:underline" href="#">Guidelines</a>
+            <a class="text-xs font-bold text-secondary tracking-widest uppercase hover:underline" href="#">Privacy Policy</a>
+        </div>
+    </footer>
+</main>
+
+<!-- Edit User Modal -->
+<div id="userEditModal" class="fixed inset-0 z-[100] bg-on-surface/40 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="userEditContent" class="bg-surface max-w-md w-full shadow-2xl relative rounded-xl border-t-8 border-primary overflow-hidden p-8 transform scale-95 transition-transform duration-300">
+        <div class="absolute top-0 right-0 p-4">
+            <button onclick="closeEditUserModal()" class="text-stone-400 hover:text-on-surface transition-colors" type="button">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <h2 class="font-headline text-2xl text-primary font-bold mb-6">Edit Akses Kurator</h2>
+        <form id="userEditForm" onsubmit="submitEditUser(event)" class="flex flex-col gap-6">
+            <input type="hidden" id="editUserId" />
+            <div>
+                <label class="block text-xs font-bold tracking-widest text-secondary uppercase mb-2">Role Pengguna</label>
+                <select id="editUserRole" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm py-3 px-4 focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all outline-none">
+                    <option value="user">User</option>
+                    <option value="admin">System Admin</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold tracking-widest text-secondary uppercase mb-2">Status Akun</label>
+                <select id="editUserStatus" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm py-3 px-4 focus:border-secondary focus:ring-1 focus:ring-secondary/30 transition-all outline-none">
+                    <option value="active">Active</option>
+                    <option value="new">New</option>
+                    <option value="on_leave">On Leave</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="flex gap-4 mt-4 flex-col md:flex-row">
+                <button type="submit" id="submitUserEditBtn" class="flex-1 bg-primary text-on-primary py-3 rounded-lg text-sm font-bold tracking-wide shadow-md hover:bg-primary-container transition-colors flex items-center justify-center gap-2">
+                    <span id="submitUserEditBtnText">Simpan Perubahan</span>
+                    <span id="submitUserEditSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                </button>
+                <button type="button" onclick="closeEditUserModal()" class="px-6 py-3 rounded-lg border border-outline-variant/40 text-sm font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors text-center">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div id="confirmDialog" class="fixed inset-0 z-[110] bg-on-surface/40 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="confirmContent" class="bg-surface max-w-sm w-full shadow-2xl relative rounded-xl overflow-hidden p-8 text-center transform scale-95 transition-transform duration-300">
+        <div class="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mx-auto mb-4 text-error">
+            <span class="material-symbols-outlined text-3xl">warning</span>
+        </div>
+        <h3 class="font-headline text-xl font-bold text-on-surface mb-2">Hapus Pengguna</h3>
+        <p class="text-sm text-on-surface-variant mb-6">Anda yakin ingin menghapus <strong id="deleteUserName"></strong>? Tindakan ini <strong class="text-error">tidak dapat dibatalkan</strong> dan seluruh koleksi arsip yang ditambahkan oleh user ini akan ikut terhapus secara permanen.</p>
+        <div class="flex gap-3">
+            <button type="button" onclick="closeConfirmDialog()" class="flex-1 px-4 py-3 border border-outline-variant/30 text-on-surface-variant font-bold text-sm rounded-lg hover:bg-surface-container transition-colors">Batal</button>
+            <button type="button" id="confirmDeleteBtn" class="flex-1 bg-error text-on-error font-bold text-sm rounded-lg hover:bg-error-container hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                <span id="confirmDeleteText">Hapus</span>
+                <span id="confirmDeleteSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="imagePreviewModal" 
+     class="fixed inset-0 bg-black/90 z-[9999] hidden flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 backdrop-blur-sm" 
+     onclick="closeImagePreview()">
+    <button onclick="closeImagePreview()" 
+            class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 flex items-center justify-center" 
+            title="Tutup">
+        <span class="material-symbols-outlined text-3xl">close</span>
+    </button>
+    <img id="imagePreviewContent" 
+         class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl scale-95 transition-transform duration-300" 
+         src="" alt="Preview Photo" />
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    // Auth guard
+    if (!requireAuth()) { /* redirected */ }
+    if (!requireAdmin()) { /* redirected */ }
+
+    const currentUser = getUser();
+    document.getElementById('headerUserName').textContent = currentUser?.full_name || '';
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type} show`;
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    // Mobile Responsiveness Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.innerWidth < 768) {
+            document.body.setAttribute('data-sidebar', 'closed');
+            const icon = document.getElementById('sidebarIcon');
+            if (icon) icon.textContent = 'menu';
+        }
+    });
+
+    // Sidebar Toggle Logic
+    function toggleSidebar() {
+        const body = document.body;
+        const icon = document.getElementById('sidebarIcon');
+        
+        if (body.getAttribute('data-sidebar') === 'open') {
+            body.setAttribute('data-sidebar', 'closed');
+            if (icon) icon.textContent = 'menu';
+        } else {
+            body.setAttribute('data-sidebar', 'open');
+            if (icon) icon.textContent = 'menu_open';
+        }
+    }
+
+    // Load active curators list
+    async function loadCurators() {
+        try {
+            const usersData = await apiGetUsers();
+            renderUsersList(usersData.data || []);
+        } catch (err) {
+            console.error('Users load error:', err);
+            showToast('Gagal memuat data pengguna', 'error');
+        }
+    }
+
+    function getStatusBadge(status) {
+        const map = {
+            'active': { bg: 'bg-green-100', text: 'text-green-700', label: 'Active' },
+            'on_leave': { bg: 'bg-amber-100', text: 'text-amber-700', label: 'On Leave' },
+            'new': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'New' },
+            'inactive': { bg: 'bg-stone-100', text: 'text-stone-500', label: 'Inactive' },
+        };
+        const s = map[status] || map['active'];
+        return `<span class="inline-flex items-center px-2 py-1 rounded-full ${s.bg} ${s.text} text-[10px] font-bold uppercase tracking-tighter">${s.label}</span>`;
+    }
+
+    function renderUsersList(users) {
+        const container = document.getElementById('usersListContainer');
+        if (!users || users.length === 0) {
+            container.innerHTML = '<div class="px-8 py-12 text-center text-stone-400"><p class="text-sm">Belum ada pengguna terdaftar.</p></div>';
+            return;
+        }
+
+        container.innerHTML = users.map(user => `
+            <div class="group px-6 md:px-8 py-4 md:py-5 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-stone-50 transition-colors gap-4 md:gap-0 border-b border-stone-50 last:border-0">
+                <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto">
+                    <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg bg-stone-200 overflow-hidden flex items-center justify-center ${user.avatar_url ? 'cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all' : ''}"
+                         ${user.avatar_url ? `onclick="openImagePreview('${user.avatar_url}')"` : ''}>
+                        ${user.avatar_url 
+                            ? `<img alt="User" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="${user.avatar_url}"/>`
+                            : `<span class="material-symbols-outlined text-stone-400">person</span>`
+                        }
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="font-headline font-bold text-on-surface break-words">${user.full_name || 'Unknown'}</h4>
+                        <p class="text-xs text-on-surface-variant">${user.specialization || user.role || ''} • Joined ${formatDate(user.created_at)}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6 md:gap-12 w-full md:w-auto justify-between md:justify-end border-t md:border-none border-stone-100 pt-3 md:pt-0 mt-2 md:mt-0">
+                    <div class="text-left md:text-right">
+                        <p class="text-[10px] font-label tracking-widest text-secondary uppercase mb-1">Archive Count</p>
+                        <p class="font-headline text-lg md:text-xl font-bold text-primary">${(user.archive_count || 0).toLocaleString()} <span class="text-[10px] text-stone-400 font-normal ml-1">items</span></p>
+                    </div>
+                    <div class="text-right whitespace-nowrap">
+                        <p class="text-[10px] font-label tracking-widest text-secondary uppercase mb-1">Status</p>
+                        ${getStatusBadge(user.status)}
+                    </div>
+                    <!-- New Actions -->
+                    <div class="flex items-center gap-1 border-l border-stone-200 pl-4 md:pl-6 ml-2 md:ml-4">
+                        <button onclick="openEditUserModal('${user.id}', '${user.role}', '${user.status}')" class="p-2 text-stone-400 hover:text-primary hover:bg-primary-container rounded-full transition-all" title="Edit Data User">
+                            <span class="material-symbols-outlined text-xl">edit</span>
+                        </button>
+                        <button onclick="promptDeleteUser('${user.id}', '${user.full_name || user.email}')" class="p-2 text-stone-400 hover:text-error hover:bg-error-container rounded-full transition-all" title="Hapus User">
+                            <span class="material-symbols-outlined text-xl">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // --- Edit User Logic ---
+    function openEditUserModal(id, role, status) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editUserRole').value = role || 'user';
+        document.getElementById('editUserStatus').value = status || 'active';
+        
+        const modal = document.getElementById('userEditModal');
+        const content = document.getElementById('userEditContent');
+        
+        modal.classList.remove('hidden');
+        void modal.offsetWidth; // trigger reflow
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+    }
+
+    function closeEditUserModal() {
+        const modal = document.getElementById('userEditModal');
+        const content = document.getElementById('userEditContent');
+        
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.getElementById('userEditForm').reset();
+        }, 300);
+    }
+
+    async function submitEditUser(e) {
+        e.preventDefault();
+        const id = document.getElementById('editUserId').value;
+        const role = document.getElementById('editUserRole').value;
+        const status = document.getElementById('editUserStatus').value;
+        
+        const btnText = document.getElementById('submitUserEditBtnText');
+        const spinner = document.getElementById('submitUserEditSpinner');
+        btnText.textContent = 'Menyimpan...';
+        spinner.classList.remove('hidden');
+        
+        try {
+            await apiFetch(`/users/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ role, status })
+            });
+            showToast('Akses pengguna berhasil diperbarui!');
+            closeEditUserModal();
+            loadCurators(); // reload table
+        } catch (err) {
+            showToast(err.message || 'Gagal mengubah akses pengguna', 'error');
+        } finally {
+            btnText.textContent = 'Simpan Perubahan';
+            spinner.classList.add('hidden');
+        }
+    }
+
+    // --- Delete User Logic ---
+    let pendingDeleteUserId = null;
+    
+    function promptDeleteUser(id, name) {
+        pendingDeleteUserId = id;
+        document.getElementById('deleteUserName').textContent = name || 'Pengguna Ini';
+        
+        const dialog = document.getElementById('confirmDialog');
+        const content = document.getElementById('confirmContent');
+        
+        dialog.classList.remove('hidden');
+        void dialog.offsetWidth;
+        dialog.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+    }
+
+    function closeConfirmDialog() {
+        pendingDeleteUserId = null;
+        const dialog = document.getElementById('confirmDialog');
+        const content = document.getElementById('confirmContent');
+        
+        dialog.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        
+        setTimeout(() => {
+            dialog.classList.add('hidden');
+        }, 300);
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        if (!pendingDeleteUserId) return;
+        
+        const btnText = document.getElementById('confirmDeleteText');
+        const spinner = document.getElementById('confirmDeleteSpinner');
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btnText.textContent = 'Menghapus...';
+        spinner.classList.remove('hidden');
+        
+        try {
+            await apiFetch(`/users/${pendingDeleteUserId}`, {
+                method: 'DELETE'
+            });
+            showToast('Pengguna berhasil dihapus beserta seluruh arsipnya.');
+            closeConfirmDialog();
+            loadCurators(); // reload table
+        } catch (err) {
+            showToast(err.message || 'Gagal menghapus pengguna', 'error');
+        } finally {
+            btn.disabled = false;
+            btnText.textContent = 'Hapus';
+            spinner.classList.add('hidden');
+        }
+    });
+
+    // --- Image Preview Logic ---
+    function openImagePreview(src) {
+        if (!src || src.endsWith('null')) return;
+        const modal = document.getElementById('imagePreviewModal');
+        const content = document.getElementById('imagePreviewContent');
+        
+        content.src = src;
+        modal.classList.remove('hidden');
+        
+        // Trigger reflow & fade in
+        void modal.offsetWidth;
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImagePreview() {
+        const modal = document.getElementById('imagePreviewModal');
+        const content = document.getElementById('imagePreviewContent');
+        
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    // Initialize Page
+    loadCurators();
+</script>
+</body>
+</html>

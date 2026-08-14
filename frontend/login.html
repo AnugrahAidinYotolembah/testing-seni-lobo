@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ARSIP DIGITAL KOMUNITAS SENI LOBO PALU - Masuk</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .animate-float {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #fbfbe2; }
+        ::-webkit-scrollbar-thumb { background: #800000; border-radius: 10px; }
+
+        .tab-active {
+            border-bottom: 2px solid #570000;
+            color: #570000;
+            background-color: rgba(245, 245, 220, 0.5);
+        }
+
+        .tab-inactive {
+            color: #5a413d;
+            border-bottom: 2px solid transparent;
+        }
+
+        .form-slide { transition: opacity 0.4s ease, transform 0.4s ease; }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: #166534; color: #fff; }
+        .toast-error { background: #991b1b; color: #fff; }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fbfbe2", "surface-container": "#efefd7",
+                        "primary-container": "#800000", "secondary-container": "#fed65b",
+                        "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+                        "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+                        "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+                        "outline": "#8e706c", "surface-variant": "#e4e4cc",
+                        "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+                        "tertiary": "#262727", "secondary": "#735c00",
+                        "surface-container-high": "#eaead1",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#570000", "on-primary-container": "#ff8371",
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-surface font-body text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Hero Backdrop -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-5%] w-[60%] h-[70%] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[80%] bg-gradient-to-tl from-secondary/15 to-transparent rounded-full blur-[100px]"></div>
+        <div class="absolute top-20 left-10 opacity-20 animate-float scale-150">
+            <span class="material-symbols-outlined text-[120px] text-secondary">flare</span>
+        </div>
+        <div class="absolute bottom-20 right-20 opacity-10 animate-float scale-125" style="animation-delay: 2s;">
+            <span class="material-symbols-outlined text-[160px] text-primary">filter_vintage</span>
+        </div>
+        <div class="absolute top-1/2 left-1/4 opacity-10 animate-float" style="animation-delay: 4s;">
+            <span class="material-symbols-outlined text-[80px] text-secondary">astrophotography_auto</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <!-- py-24 ditambahkan agar form tidak terpotong di bagian atas/bawah saat di-scroll -->
+    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 py-24 md:p-6 md:py-12">
+        <!-- Back to Landing Page Button -->
+        <a href="index.html"
+            class="absolute top-6 left-6 md:left-10 text-stone-500 hover:text-primary transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-wider group bg-white/50 backdrop-blur-md px-4 py-2.5 rounded-lg border border-stone-200/20 shadow-sm z-20">
+            <span class="material-symbols-outlined text-sm transition-transform group-hover:-translate-x-1">arrow_back</span>
+            Kembali ke Beranda
+        </a>
+        
+        <!-- Branding -->
+        <div class="mb-4 text-center space-y-1">
+            <h2 class="font-headline text-primary text-[10px] md:text-xs tracking-[0.3em] font-bold">ARSIP DIGITAL</h2>
+            <h1 class="font-headline text-2xl md:text-3xl font-black italic tracking-tighter text-primary-container">Lobo Palu</h1>
+            <div class="flex items-center justify-center gap-3">
+                <div class="h-[1px] w-8 bg-gradient-to-r from-transparent via-secondary to-transparent"></div>
+                <p class="font-label text-secondary text-[9px] md:text-[10px] uppercase tracking-widest font-semibold">Komunitas Seni &amp; Budaya</p>
+                <div class="h-[1px] w-8 bg-gradient-to-l from-transparent via-secondary to-transparent"></div>
+            </div>
+        </div>
+
+        <!-- Authentication Card -->
+        <div id="authCard" class="w-full max-w-md bg-white/40 backdrop-blur-2xl rounded-xl shadow-[0_20px_50px_rgba(87,0,0,0.08)] border border-white/50 relative">
+            
+            <!-- Role Switcher -->
+            <div class="flex border-b border-outline-variant/20" id="roleTabs">
+                <button id="tabUser" onclick="switchRole('user')" class="flex-1 py-2.5 text-xs font-bold tracking-widest uppercase transition-all duration-300 tab-active">
+                    Pengguna
+                </button>
+                <button id="tabAdmin" onclick="switchRole('admin')" class="flex-1 py-2.5 text-xs font-bold tracking-widest uppercase transition-all duration-300 tab-inactive hover:bg-surface-container-low/30">
+                    Administrator
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="px-8 py-5 md:px-10 md:py-6 form-slide">
+                <div class="mb-4">
+                    <h3 id="loginTitle" class="font-headline text-xl text-on-surface font-bold">Selamat Datang</h3>
+                    <p id="loginSubtitle" class="text-on-surface-variant text-sm mt-0.5">Masuk untuk menjelajahi arsip budaya kami.</p>
+                </div>
+                <form id="loginFormEl" class="space-y-4" onsubmit="handleLogin(event)">
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="loginEmail">Email / Username</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="loginEmail" placeholder="nama@email.com" type="email" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg">alternate_email</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="loginPassword">Kata Sandi</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="loginPassword" placeholder="••••••••" type="password" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg cursor-pointer hover:text-primary" onclick="togglePasswordVisibility('loginPassword', this)">visibility</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary-container/20" type="checkbox" />
+                            <span class="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">Ingat saya</span>
+                        </label>
+                        <button type="button" onclick="showForgotForm()" class="text-xs text-primary hover:underline font-semibold tracking-wide">
+                            Lupa kata sandi?
+                        </button>
+                    </div>
+                    <button id="loginBtn" class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-3 rounded-lg font-bold text-sm tracking-widest uppercase shadow-lg shadow-primary/20 transform active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-2" type="submit">
+                        <span id="loginBtnText">Masuk Sekarang</span>
+                        <span id="loginSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                    </button>
+                </form>
+                
+                <div id="registerSection">
+                    <div class="my-4 flex items-center gap-4">
+                        <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+                        <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Atau</span>
+                        <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+                    </div>
+                    <!-- Google Sign-In Button -->
+                    <div class="mb-3 flex justify-center">
+                        <div id="g_id_onload" data-client_id="595138260429-a86q7600kgpcucgctifgbjotqjd11ni3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleGoogleCredentialResponse" data-auto_prompt="false"></div>
+                        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-on-surface-variant mb-2">Belum memiliki akun?</p>
+                        <button onclick="showRegisterForm()" class="px-6 py-2 border border-outline-variant/50 text-primary font-bold text-xs tracking-widest uppercase hover:bg-surface-container transition-all rounded-lg">
+                            Daftar Anggota Baru
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Admin info -->
+                <div id="adminInfoSection" class="hidden mt-8 text-center">
+                    <div class="p-4 bg-surface-container-low/60 rounded-lg border border-outline-variant/15">
+                        <span class="material-symbols-outlined text-secondary text-2xl mb-2 block">admin_panel_settings</span>
+                        <p class="text-xs text-on-surface-variant">Akses khusus administrator.<br />Hubungi pengelola sistem untuk mendapatkan akun.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Form (hidden by default) -->
+            <div id="registerForm" class="p-8 md:p-10 form-slide hidden">
+                <div class="mb-4">
+                    <h3 class="font-headline text-xl text-on-surface font-bold">Daftar Akun Baru</h3>
+                    <p class="text-on-surface-variant text-sm mt-0.5">Bergabunglah untuk menjaga warisan budaya.</p>
+                </div>
+                <form id="registerFormEl" class="space-y-5" onsubmit="handleRegister(event)">
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="regName">Nama Lengkap</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="regName" placeholder="Nama lengkap Anda" type="text" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg">person</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="regEmail">Email</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="regEmail" placeholder="nama@email.com" type="email" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg">alternate_email</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="regPassword">Kata Sandi</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="regPassword" placeholder="Min. 6 karakter" type="password" minlength="6" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg cursor-pointer hover:text-primary" onclick="togglePasswordVisibility('regPassword', this)">visibility</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="regConfirm">Konfirmasi Kata Sandi</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="regConfirm" placeholder="Masukkan ulang kata sandi" type="password" minlength="6" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg cursor-pointer hover:text-primary" onclick="togglePasswordVisibility('regConfirm', this)">visibility</span>
+                        </div>
+                    </div>
+                    <button id="registerBtn" class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 rounded-lg font-bold text-sm tracking-widest uppercase shadow-lg shadow-primary/20 transform active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-2" type="submit">
+                        <span id="registerBtnText">Daftar Sekarang</span>
+                        <span id="registerSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                    </button>
+                </form>
+                <div class="my-4 flex items-center gap-4">
+                    <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+                    <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Atau</span>
+                    <div class="flex-1 h-[1px] bg-outline-variant/20"></div>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <button onclick="triggerGoogleSignUp()" class="flex items-center gap-3 px-6 py-2.5 border border-outline-variant/40 rounded-lg hover:bg-surface-container-low/50 transition-all shadow-sm">
+                        <svg width="18" height="18" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-on-surface-variant">Daftar dengan Google</span>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm text-on-surface-variant mb-2">Sudah punya akun?</p>
+                    <button onclick="showLoginForm()" class="text-primary font-bold text-xs tracking-widest uppercase hover:underline">
+                        Kembali ke Halaman Masuk
+                    </button>
+                </div>
+            </div>
+
+            <!-- Forgot Password Form (hidden by default) -->
+            <div id="forgotForm" class="p-8 md:p-10 form-slide hidden">
+                <div class="mb-8">
+                    <h3 class="font-headline text-2xl text-on-surface font-bold">Atur Ulang Kata Sandi</h3>
+                    <p class="text-on-surface-variant text-sm mt-1">Masukkan email Anda dan kata sandi baru untuk memperbarui akun.</p>
+                </div>
+                <form id="forgotFormEl" class="space-y-5" onsubmit="handleForgotPassword(event)">
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="forgotEmail">Alamat Email</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="forgotEmail" placeholder="nama@email.com" type="email" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg">alternate_email</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="forgotNewPassword">Kata Sandi Baru</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="forgotNewPassword" placeholder="Min. 6 karakter" type="password" minlength="6" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg cursor-pointer hover:text-primary" onclick="togglePasswordVisibility('forgotNewPassword', this)">visibility</span>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold tracking-widest text-secondary uppercase mb-1" for="forgotConfirmPassword">Konfirmasi Kata Sandi Baru</label>
+                        <div class="relative">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant/40 py-2.5 focus:ring-0 focus:border-secondary transition-all text-on-surface placeholder:text-stone-400" id="forgotConfirmPassword" placeholder="Masukkan ulang kata sandi" type="password" minlength="6" required />
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline text-lg cursor-pointer hover:text-primary" onclick="togglePasswordVisibility('forgotConfirmPassword', this)">visibility</span>
+                        </div>
+                    </div>
+                    <button id="forgotBtn" class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 rounded-lg font-bold text-sm tracking-widest uppercase shadow-lg shadow-primary/20 transform active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-2" type="submit">
+                        <span id="forgotBtnText">Ubah Kata Sandi</span>
+                        <span id="forgotSpinner" class="hidden material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                    </button>
+                </form>
+                <div class="mt-8 text-center">
+                    <button onclick="showLoginForm()" class="text-primary font-bold text-xs tracking-widest uppercase hover:underline">
+                        Kembali ke Halaman Masuk
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Gradient Bar -->
+            <div class="h-2 w-full bg-gradient-to-r from-secondary via-primary to-secondary"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-[10px] tracking-[0.2em] font-medium text-on-surface-variant/60 uppercase">
+            © 2024 Lobo Palu Cultural Archive • Digital Curator Team
+        </footer>
+    </main>
+
+    <!-- Corner Decorations -->
+    <div class="fixed top-0 right-0 w-32 h-32 md:w-64 md:h-64 pointer-events-none opacity-20">
+        <div class="absolute inset-0 bg-secondary blur-3xl rounded-full -translate-y-1/2 translate-x-1/2"></div>
+    </div>
+    <div class="fixed bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 pointer-events-none opacity-20">
+        <div class="absolute inset-0 bg-primary blur-3xl rounded-full translate-y-1/2 -translate-x-1/2"></div>
+    </div>
+
+    <script src="js/api.js?v=3"></script>
+    <script>
+        // ── State ──
+        let selectedRole = 'user';
+
+        // ── If already logged in, redirect ──
+        if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+            const user = typeof getUser === 'function' ? getUser() : null;
+            if (user) {
+                window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'user-home.html';
+            }
+        }
+
+        // ── Role switcher ──
+        function switchRole(role) {
+            selectedRole = role;
+            const tabUser = document.getElementById('tabUser');
+            const tabAdmin = document.getElementById('tabAdmin');
+            const registerSection = document.getElementById('registerSection');
+            const adminInfoSection = document.getElementById('adminInfoSection');
+            const loginTitle = document.getElementById('loginTitle');
+            const loginSubtitle = document.getElementById('loginSubtitle');
+
+            showLoginForm();
+
+            if (role === 'user') {
+                tabUser.className = tabUser.className.replace('tab-inactive', '').trim() + ' tab-active';
+                tabAdmin.className = tabAdmin.className.replace('tab-active', '').trim() + ' tab-inactive';
+                registerSection.classList.remove('hidden');
+                adminInfoSection.classList.add('hidden');
+                loginTitle.textContent = 'Selamat Datang';
+                loginSubtitle.textContent = 'Masuk untuk menjelajahi arsip budaya kami.';
+            } else {
+                tabAdmin.className = tabAdmin.className.replace('tab-inactive', '').trim() + ' tab-active';
+                tabUser.className = tabUser.className.replace('tab-active', '').trim() + ' tab-inactive';
+                registerSection.classList.add('hidden');
+                adminInfoSection.classList.remove('hidden');
+                loginTitle.textContent = 'Panel Administrator';
+                loginSubtitle.textContent = 'Masuk dengan akun administrator Anda.';
+            }
+        }
+
+        // ── Form toggle ──
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('forgotForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        function showForgotForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('forgotForm').classList.remove('hidden');
+        }
+
+        function togglePasswordVisibility(inputId, iconEl) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconEl.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                iconEl.textContent = 'visibility';
+            }
+        }
+
+        // ── Toast ──
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ── Google Sign-In Callback Handler ──
+        async function handleGoogleCredentialResponse(response) {
+            const googleToken = response.credential;
+            
+            showToast('Memproses login Google...', 'success');
+
+            try {
+                if (typeof apiGoogleLogin === 'function') {
+                    const data = await apiGoogleLogin(googleToken);
+                    
+                    showToast('Login Google berhasil! Mengarahkan...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.user.role === 'admin' ? 'admin-dashboard.html' : 'user-home.html';
+                    }, 800);
+                } else {
+                    console.log("Token Google Anda:", googleToken);
+                    showToast('Fungsi backend untuk Google Login belum dibuat (apiGoogleLogin). Cek console.', 'error');
+                }
+            } catch (err) {
+                showToast(err.message || 'Gagal masuk dengan Google', 'error');
+            }
+        }
+
+        // ── Login handler ──
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            document.getElementById('loginBtnText').textContent = 'Memproses...';
+            document.getElementById('loginSpinner').classList.remove('hidden');
+            document.getElementById('loginBtn').disabled = true;
+
+            try {
+                if(typeof apiLogin === 'function') {
+                    const data = await apiLogin(email, password);
+                    showToast('Login berhasil! Mengarahkan...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.user.role === 'admin' ? 'admin-dashboard.html' : 'user-home.html';
+                    }, 800);
+                }
+            } catch (err) {
+                showToast(err.message || 'Login gagal', 'error');
+                document.getElementById('loginBtnText').textContent = 'Masuk Sekarang';
+                document.getElementById('loginSpinner').classList.add('hidden');
+                document.getElementById('loginBtn').disabled = false;
+            }
+        }
+
+        // ── Google Sign Up trigger ──
+        function triggerGoogleSignUp() {
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        showToast('Popup Google tidak muncul. Coba gunakan tombol "Sign in with Google" di halaman Masuk.', 'error');
+                    }
+                });
+            } else {
+                showToast('Google SDK belum dimuat. Silakan refresh halaman.', 'error');
+            }
+        }
+
+        // ── Register handler ──
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+
+            if (password !== confirm) {
+                showToast('Kata sandi tidak cocok!', 'error');
+                return;
+            }
+
+            document.getElementById('registerBtnText').textContent = 'Memproses...';
+            document.getElementById('registerSpinner').classList.remove('hidden');
+            document.getElementById('registerBtn').disabled = true;
+
+            try {
+                if(typeof apiRegister === 'function') {
+                    const data = await apiRegister(email, password, name, 'user');
+                    showToast('Registrasi berhasil! Mengarahkan...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.user.role === 'admin' ? 'admin-dashboard.html' : 'user-home.html';
+                    }, 800);
+                }
+            } catch (err) {
+                showToast(err.message || 'Registrasi gagal', 'error');
+                document.getElementById('registerBtnText').textContent = 'Daftar Sekarang';
+                document.getElementById('registerSpinner').classList.add('hidden');
+                document.getElementById('registerBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

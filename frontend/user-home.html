@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Lobo Palu | Beranda Arsip Digital</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fbfbe2", "surface-container": "#efefd7",
+                        "primary-container": "#800000", "secondary-container": "#fed65b",
+                        "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+                        "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+                        "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+                        "outline": "#8e706c", "surface-variant": "#e4e4cc",
+                        "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+                        "tertiary": "#262727", "secondary": "#735c00",
+                        "surface-container-high": "#eaead1",
+                        "surface-container-highest": "#e4e4cc",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#570000", "on-primary-container": "#ff8371",
+                        "error-container": "#ffdad6", "tertiary-container": "#3c3c3c",
+                        "on-tertiary-container": "#a8a6a6", "surface-dim": "#dbdcc3",
+                    },
+                    fontFamily: { "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"] },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            background: #166534;
+            color: #fff;
+        }
+
+        .toast-error {
+            background: #991b1b;
+            color: #fff;
+        }
+
+        .nav-link {
+            transition: all 0.4s ease-in-out;
+        }
+
+        .nav-link:hover {
+            transform: translateX(4px);
+        }
+
+        .nav-active {
+            background: rgba(231, 229, 228, 0.5);
+            color: #7f1d1d;
+            border-right: 4px solid #d97706;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .fade-in-1 {
+            animation-delay: 0.1s;
+        }
+
+        .fade-in-2 {
+            animation-delay: 0.2s;
+        }
+
+        .fade-in-3 {
+            animation-delay: 0.3s;
+        }
+
+        .fade-in-4 {
+            animation-delay: 0.4s;
+        }
+
+        .fade-in-5 {
+            animation-delay: 0.5s;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .gallery-card {
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface" data-sidebar="open">
+    <style>
+        /* Responsive Sidebar Styles */
+        body[data-sidebar="open"] #sidebar { transform: translateX(0); }
+        body[data-sidebar="closed"] #sidebar { transform: translateX(-100%); }
+        
+        @media (min-width: 768px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 18rem; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 0; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+        }
+        
+        body[data-sidebar="open"] #openSidebarBtn { display: none !important; }
+        body[data-sidebar="closed"] #openSidebarBtn { display: block !important; }
+
+        /* Mobile Overlay */
+        #mobileOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 40;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mobileOverlay { display: block; }
+        }
+    </style>
+    <div id="toast" class="toast"></div>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="h-screen w-72 fixed left-0 top-0 border-r border-stone-200/30 bg-stone-100/80 backdrop-blur-2xl flex flex-col py-8 px-4 gap-6 shadow-[20px_0_40px_rgba(27,29,14,0.04)] z-50 transition-transform duration-300">
+        <div class="flex items-center justify-between px-4 mb-8">
+            <div class="flex flex-col gap-1">
+                <h1 class="font-serif font-black text-red-950 text-2xl tracking-tight">Lobo Palu</h1>
+                <p class="font-serif text-sm tracking-wide text-stone-500">Digital Curator</p>
+            </div>
+            <button onclick="toggleSidebar()" class="p-2 bg-stone-200/50 hover:bg-stone-300 text-stone-600 hover:text-primary rounded-lg transition-all focus:outline-none" title="Tutup Menu">
+                <span class="material-symbols-outlined text-xl">menu_open</span>
+            </button>
+        </div>
+        <nav class="flex-1 flex flex-col gap-2">
+            <a class="nav-link nav-active flex items-center gap-4 px-4 py-3 font-serif text-sm tracking-wide"
+                href="user-home.html">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+                <span>Home</span>
+            </a>
+            <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                href="user-collections.html">
+                <span class="material-symbols-outlined">collections_bookmark</span>
+                <span>Collections</span>
+            </a>
+            <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                href="user-portal.html">
+                <span class="material-symbols-outlined">person</span>
+                <span>Profile</span>
+            </a>
+            <div id="adminNavSection" class="hidden mt-4 pt-4 border-t border-stone-200/20">
+                <p class="px-4 text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2">Admin</p>
+                <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                    href="admin-dashboard.html">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide"
+                    href="admin-collections.html">
+                    <span class="material-symbols-outlined">library_books</span>
+                    <span>Manage Data</span>
+                </a>
+            </div>
+        </nav>
+        <div class="mt-auto flex flex-col gap-2 px-4 border-t border-stone-200/30 pt-6">
+            <a class="nav-link flex items-center gap-4 py-2 text-stone-500 font-serif text-sm cursor-pointer"
+                onclick="logout()">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="min-h-screen relative transition-all duration-300">
+        
+        <!-- Open Sidebar Button (Visible only when closed) -->
+        <div class="sticky top-6 z-[60] ml-6 md:ml-12 mt-6 mb-4 w-fit hidden" id="openSidebarBtn">
+            <button onclick="toggleSidebar()" class="w-11 h-11 bg-white border border-stone-200/50 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.08)] text-stone-600 hover:text-primary hover:border-primary/30 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-0 group" title="Buka Menu">
+                <span class="material-symbols-outlined text-[22px] transition-transform duration-300 group-hover:scale-110">menu</span>
+            </button>
+        </div>
+
+        <!-- Hero Section (Personalized Welcome) -->
+        <section class="max-w-[1400px] mx-auto px-6 md:px-12 py-8 md:py-12 fade-in">
+            <div class="bg-[#e9ead6] rounded-3xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-16 relative border border-[#dce0c3]">
+                
+                <!-- Left Text Content -->
+                <div class="relative z-10 w-full md:w-3/5 pb-12 md:pb-0 md:pr-12">
+                    <h1 class="font-headline text-5xl md:text-6xl lg:text-7xl font-black text-primary leading-tight mb-0 tracking-tight">
+                        Selamat Datang,
+                    </h1>
+                    <h2 id="heroUserName" class="font-headline text-5xl md:text-6xl lg:text-7xl font-bold italic text-[#73631f] leading-tight mb-6 tracking-tight">
+                        Pengguna
+                    </h2>
+                    
+                    <p class="text-on-surface-variant text-base lg:text-lg leading-relaxed mb-10 max-w-lg font-medium opacity-90">
+                        Perjalanan kurasi Anda berlanjut. Hari ini, artefak baru dari Sulawesi Tengah menanti untuk direview dan dieksplorasi oleh Anda.
+                    </p>
+                    
+                    <a href="user-collections.html"
+                        class="inline-flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-xl font-bold text-sm tracking-widest shadow-lg hover:bg-primary-container transition-all hover:-translate-y-1">
+                        Lihat Koleksi Hari Ini
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Right Image Showcase -->
+                <div class="w-full md:w-2/5 flex justify-center md:justify-end relative z-10">
+                    <div class="relative transform rotate-3 hover:rotate-1 hover:scale-105 transition-all duration-500 ease-out">
+                        <!-- Polaroid Frame -->
+                        <div class="bg-surface-container-lowest p-3 pb-10 md:p-4 md:pb-12 rounded shadow-[20px_20px_40px_rgba(0,0,0,0.1)] border border-outline-variant/10">
+                            <div class="w-64 h-64 lg:w-80 lg:h-80 bg-black overflow-hidden relative border border-outline-variant/10">
+                                <img id="heroImage" src="https://images.unsplash.com/photo-1601297576571-085e334a17fd?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-opacity duration-700" alt="Artifact Spotlight" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Curated Artifacts -->
+        <section class="px-6 md:px-12 py-8">
+            <div class="flex items-center gap-4 md:gap-6 mb-8">
+                <div class="h-px flex-1 bg-outline-variant/30"></div>
+                <h3 class="font-headline text-lg md:text-xl font-bold text-primary text-center">Top Curated Artifacts</h3>
+                <div class="h-px flex-1 bg-outline-variant/30"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Featured Card 1 -->
+                <div>
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden mb-4 shadow-md bg-stone-100">
+                        <img src="https://engrasia.com/cdn/shop/products/IMG_4895.jpg?v=1722919029&width=1600"
+                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                            alt="Batik Tulis Pekalongan"
+                            onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Batik_megamendung.jpg/800px-Batik_megamendung.jpg'" />
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                        <h4 class="font-headline font-bold text-primary text-xl">Batik Tulis Pekalongan (1890)</h4>
+                        <span
+                            class="text-[8px] font-bold uppercase tracking-widest bg-surface-container-high px-2 py-1 rounded text-secondary whitespace-nowrap border border-outline-variant/20">Rare
+                            Find</span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">A magnificent example of the
+                        "Pesisiran" style, featuring intricate floral patterns and Dutch influence in its color palette.
+                    </p>
+                </div>
+                <!-- Featured Card 2 -->
+                <div>
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden mb-4 shadow-md bg-stone-900">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Kris_display.jpg"
+                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-700 opacity-90 grayscale-[30%]"
+                            alt="Keris Luk 13" />
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                        <h4 class="font-headline font-bold text-primary text-xl">Keris Luk 13 Majapahit</h4>
+                        <span
+                            class="text-[8px] font-bold uppercase tracking-widest bg-surface-container-high px-2 py-1 rounded text-secondary whitespace-nowrap border border-outline-variant/20">Imperial
+                            Heritage</span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">An authentic Luk 13 keris from the
+                        Majapahit era, showcasing the peak of Indonesian steel craftsmanship and spiritual significance.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <section class="bg-surface-container-lowest border-b border-outline-variant/10 px-6 md:px-12 py-8 md:py-12">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-20">
+                <div class="text-center">
+                    <p id="statTotal" class="text-4xl lg:text-5xl font-headline font-black text-primary">—</p>
+                    <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mt-2">Total Arsip</p>
+                </div>
+                <div class="w-16 h-px md:w-px md:h-16 bg-outline-variant/30"></div>
+                <div class="text-center">
+                    <p id="statCategories" class="text-4xl lg:text-5xl font-headline font-black text-secondary">18</p>
+                    <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mt-2">Kategori</p>
+                </div>
+                <div class="w-16 h-px md:w-px md:h-16 bg-outline-variant/30"></div>
+                <div class="text-center">
+                    <p id="statContributors" class="text-4xl lg:text-5xl font-headline font-black text-tertiary">—</p>
+                    <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mt-2">Kontributor</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: About / Cultural Intro -->
+        <section class="px-6 md:px-12 py-12 md:py-20 relative">
+            <div class="max-w-4xl mx-auto text-center">
+                <span class="text-secondary text-xs font-bold tracking-[0.3em] uppercase">Tentang Arsip</span>
+                <h2 class="font-headline text-4xl font-bold text-on-surface mt-4 mb-6">Melestarikan Jiwa <span
+                        class="italic text-primary">Tanah Kaili</span></h2>
+                <p class="text-on-surface-variant leading-relaxed text-lg">
+                    Arsip Digital Lobo Palu merupakan inisiatif komunitas untuk mendokumentasikan dan melestarikan
+                    kekayaan budaya masyarakat Kaili dan sekitarnya. Mulai dari tenun sutera khas Donggala, alat musik
+                    tradisional Lalove, hingga naskah-naskah kuno — setiap artefak menyimpan cerita yang layak untuk
+                    diwariskan.
+                </p>
+            </div>
+            <!-- Culture Highlights -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-5xl mx-auto">
+                <div
+                    class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10 text-center group hover:-translate-y-2 transition-all duration-500">
+                    <div
+                        class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">checkroom</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-primary mb-2">Kain Tenun</h3>
+                    <p class="text-sm text-on-surface-variant">Sutera Donggala, Sarung Bomba, dan ragam motif
+                        tradisional yang menjadi identitas budaya.</p>
+                </div>
+                <div
+                    class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10 text-center group hover:-translate-y-2 transition-all duration-500">
+                    <div
+                        class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-secondary text-3xl">music_note</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-primary mb-2">Musik & Ritual</h3>
+                    <p class="text-sm text-on-surface-variant">Lalove, Ganda, Kakula — instrumen sakral yang mengiringi
+                        upacara adat masyarakat Kaili.</p>
+                </div>
+                <div
+                    class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10 text-center group hover:-translate-y-2 transition-all duration-500">
+                    <div
+                        class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">history_edu</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-primary mb-2">Naskah & Sejarah</h3>
+                    <p class="text-sm text-on-surface-variant">Dokumentasi lontar, manuskrip, dan catatan sejarah yang
+                        menyimpan kebijaksanaan masa lampau.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Gallery Grid -->
+        <section id="gallerySection" class="px-6 md:px-12 py-12 md:py-16 bg-surface-container-low/50">
+            <!-- Ornamental Header -->
+            <div class="flex items-center justify-center gap-8 mb-12">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-secondary/30"></div>
+                <div class="text-center">
+                    <span class="text-secondary text-[10px] font-bold tracking-[0.3em] uppercase block mb-1">Digital
+                        Repository</span>
+                    <h2 class="font-headline text-3xl font-bold text-on-surface">Koleksi Terbaru</h2>
+                </div>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-secondary/30"></div>
+            </div>
+
+            <!-- Filter Tabs (scrollable) -->
+            <div class="flex justify-center mb-12">
+                <div class="flex gap-2 overflow-x-auto max-w-2xl px-2 py-2 scrollbar-thin"
+                    style="scrollbar-width: thin; -ms-overflow-style: none;">
+                    <button onclick="filterGallery('all')" id="filterAll"
+                        class="px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-primary bg-primary text-on-primary rounded-full transition-colors whitespace-nowrap shrink-0">Semua</button>
+                    <button onclick="filterGallery('Photography')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Foto</button>
+                    <button onclick="filterGallery('Cinematography')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Sinema</button>
+                    <button onclick="filterGallery('Textile')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Tekstil</button>
+                    <button onclick="filterGallery('Manuscript')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Naskah</button>
+                    <button onclick="filterGallery('Artifact')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Artefak</button>
+                    <button onclick="filterGallery('Audio Record')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Audio</button>
+                    <button onclick="filterGallery('Video')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Video</button>
+                    <button onclick="filterGallery('Lukisan')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Lukisan</button>
+                    <button onclick="filterGallery('Tari')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Tari</button>
+                    <button onclick="filterGallery('Cerpen')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Cerpen</button>
+                    <button onclick="filterGallery('Puisi')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Puisi</button>
+                    <button onclick="filterGallery('Teater')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Teater</button>
+                    <button onclick="filterGallery('Musik Tradisional')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Musik</button>
+                    <button onclick="filterGallery('Kerajinan')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Kerajinan</button>
+                    <button onclick="filterGallery('Ritual')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Ritual</button>
+                    <button onclick="filterGallery('Cerita Rakyat')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Cerita
+                        Rakyat</button>
+                    <button onclick="filterGallery('Arsitektur Tradisional')"
+                        class="filter-btn px-4 py-1.5 text-[10px] font-bold tracking-wider uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors whitespace-nowrap shrink-0">Arsitektur</button>
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="galleryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div class="col-span-full text-center py-16 text-stone-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                    <p class="text-sm">Memuat koleksi...</p>
+                </div>
+            </div>
+
+            <!-- View More -->
+            <div class="text-center mt-12">
+                <a href="user-collections.html"
+                    class="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-widest uppercase hover:gap-4 transition-all">
+                    <span>Lihat Semua Koleksi</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="px-12 py-20 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-5 pointer-events-none">
+                <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-primary blur-[150px]"></div>
+                <div class="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-secondary blur-[120px]"></div>
+            </div>
+            <div class="relative z-10">
+                <span class="material-symbols-outlined text-secondary text-5xl mb-4">volunteer_activism</span>
+                <h2 class="font-headline text-4xl font-bold text-on-surface mb-4">Ikut Melestarikan Budaya</h2>
+                <p class="text-on-surface-variant text-lg max-w-xl mx-auto mb-10">Jadilah bagian dari gerakan
+                    pelestarian digital. Unggah artefak, dokumen, atau rekaman yang Anda miliki.</p>
+                <a href="user-collections.html"
+                    class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-10 py-4 rounded-lg font-bold text-sm tracking-widest uppercase shadow-lg hover:opacity-90 transition-all inline-flex items-center gap-3">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    Kontribusi Sekarang
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-24 border-t border-outline-variant/30 pt-16 bg-surface-container relative z-10 w-full">
+            <div
+                class="px-8 lg:px-12 grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-12 text-sm text-on-surface-variant mb-16">
+
+                <!-- Company Info & Addresses -->
+                <div class="space-y-6">
+                    <div>
+                        <h2
+                            class="font-serif font-black text-primary text-2xl tracking-tight mb-1 flex items-center gap-2">
+                            Lobo Palu
+                        </h2>
+                        <p class="font-serif text-[10px] tracking-widest text-stone-500 uppercase">Kreator Digital</p>
+                    </div>
+                    <p class="leading-loose text-sm">
+                        Palu, Sulawesi Tengah<br>
+                        Jl. Seni Budaya No. 12<br>
+                        Kota Palu 90221
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-4 text-xs mt-6">
+                        <div>
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">call</span> Telepon</p>
+                            <p>+62 812 3456 7890</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">mail</span> Email</p>
+                            <p>info@lobopalu.org</p>
+                        </div>
+                        <div class="col-span-2 mt-2">
+                            <p class="font-bold text-on-surface flex items-center gap-2 mb-1"><span
+                                    class="material-symbols-outlined text-[16px]">support_agent</span> Layanan Pelanggan
+                            </p>
+                            <p>0812 3456 7890 (WA)<br>Support: support@lobopalu.org</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produk & Layanan -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Produk & Layanan</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Arsip Kebudayaan Lokal</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Digitalisasi Artefak</a></li>
+                    </ul>
+                    <h3 class="font-bold text-base text-on-surface mb-6 mt-8">Solusi</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Penelusuran Koleksi Ekstensif</a>
+                        </li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Kontribusi Publik Terbuka</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Analisis Data Budaya</a></li>
+                    </ul>
+                </div>
+
+                <!-- Tentang Kami -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Tentang Kami</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Mengenal Lobo Palu</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Mengapa Lobo Palu</a></li>
+                    </ul>
+                    <h3 class="font-bold text-base text-on-surface mb-6 mt-8">Media & Informasi</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-primary transition-colors">Berita & Publikasi</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Blog Kegiatan Seni</a></li>
+                    </ul>
+                </div>
+
+                <!-- CSR / Lainnya -->
+                <div>
+                    <h3 class="font-bold text-base text-on-surface mb-6">Informasi Lain</h3>
+                    <ul class="space-y-5 text-on-surface text-sm">
+                        <li><a href="#" class="hover:text-primary transition-colors">Sponsorship & CSR</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Jangkauan Layanan</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Whistleblowing System</a>
+                        </li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Karir Relawan</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Privacy Notice</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors font-bold">Bantuan Teknis (FAQ)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright Section -->
+            <div
+                class="bg-primary text-on-primary py-6 px-8 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 relative shadow-[inset_0_4px_20px_rgba(0,0,0,0.2)]">
+
+                <div class="flex items-center gap-6">
+                    <!-- Social Media -->
+                    <div class="flex gap-4 items-center">
+                        <a href="https://www.linkedin.com/in/komunitaslobo/"
+                            class="hover:text-secondary hover:-translate-y-1 transition-all" title="LinkedIn">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all"
+                            title="X (Twitter)">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/komunitaslobo/"
+                            class="hover:text-secondary hover:-translate-y-1 transition-all" title="Instagram">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069v-2.162zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all" title="Facebook">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M22.675 0h-21.35C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="hover:text-secondary hover:-translate-y-1 transition-all" title="YouTube">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div
+                    class="text-[11px] md:text-sm text-center font-medium opacity-90 mx-auto w-full md:w-auto mt-4 md:mt-0">
+                    Copyright © 2024 Arsip Digital Komunitas Seni Lobo Palu. All rights reserved.
+                </div>
+
+                <div
+                    class="text-center md:text-right flex flex-col items-center md:items-end w-full md:w-auto mt-4 md:mt-0 mr-4">
+                    <span class="text-[9px] tracking-widest uppercase text-secondary/70 font-bold mb-1">Kolaborasi
+                        Oleh</span>
+                    <span class="font-serif font-black text-lg tracking-wider text-orange-200"
+                        style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">komunitas lobo<span
+                            class="text-secondary text-2xl leading-none">.</span></span>
+                </div>
+
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    class="absolute -top-6 left-8 bg-primary-container text-white p-2 md:p-3 shadow-xl hover:bg-secondary hover:text-on-secondary transition-all hover:-translate-y-2 rounded-md">
+                    <span class="material-symbols-outlined text-xl leading-none block">expand_less</span>
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirected */ }
+
+        const currentUser = getUser();
+        if (currentUser && currentUser.role === 'admin') {
+            document.getElementById('adminNavSection').classList.remove('hidden');
+        }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = `toast toast-${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Mobile Responsiveness Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth < 768) {
+                document.body.setAttribute('data-sidebar', 'closed');
+            }
+        });
+
+        // Sidebar Toggle Logic
+        function toggleSidebar() {
+            const body = document.body;
+            if (body.getAttribute('data-sidebar') === 'open') {
+                body.setAttribute('data-sidebar', 'closed');
+            } else {
+                body.setAttribute('data-sidebar', 'open');
+            }
+        }
+
+        let allGalleryItems = [];
+
+        async function loadHome() {
+            try {
+                if (currentUser && currentUser.full_name) {
+                    document.getElementById('heroUserName').textContent = currentUser.full_name;
+                }
+                const result = await apiGetCollections({ limit: 50, sort_by: 'created_at', sort_order: 'desc' });
+                allGalleryItems = result.data || [];
+                document.getElementById('statTotal').textContent = result.total || 0;
+                renderGallery(allGalleryItems);
+                
+                // Set Hero Image to latest collection if available
+                if (allGalleryItems.length > 0) {
+                    const latestImg = allGalleryItems.find(i => i.thumbnail_url || (i.file_url && i.file_url.match(/\.(jpeg|jpg|png|webp|gif)/i)));
+                    if (latestImg) {
+                        const imgUrl = latestImg.thumbnail_url || latestImg.file_url;
+                        if (imgUrl) document.getElementById('heroImage').src = imgUrl;
+                    }
+                }
+
+                // Load user stats
+                try {
+                    const userStats = await apiGetUserStats();
+                    document.getElementById('statContributors').textContent = userStats.total_users || '—';
+                } catch (e) {
+                    document.getElementById('statContributors').textContent = '—';
+                }
+            } catch (err) {
+                console.error('Load error:', err);
+                showToast('Gagal memuat data', 'error');
+            }
+        }
+
+        function filterGallery(category) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = b.className.replace('border-primary bg-primary text-on-primary', 'border-outline-variant/30 text-on-surface-variant');
+            });
+            const allBtn = document.getElementById('filterAll');
+            if (category === 'all') {
+                allBtn.className = 'px-5 py-2 text-xs font-bold tracking-widest uppercase border border-primary bg-primary text-on-primary rounded-full transition-colors';
+                renderGallery(allGalleryItems);
+            } else {
+                allBtn.className = 'filter-btn px-5 py-2 text-xs font-bold tracking-widest uppercase border border-outline-variant/30 text-on-surface-variant rounded-full hover:border-primary hover:text-primary transition-colors';
+                // Find and highlight the clicked button
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    if (b.textContent.trim() && b.onclick && b.onclick.toString().includes(category)) {
+                        b.className = 'filter-btn px-5 py-2 text-xs font-bold tracking-widest uppercase border border-primary bg-primary text-on-primary rounded-full transition-colors';
+                    }
+                });
+                const filtered = allGalleryItems.filter(i => i.category === category);
+                renderGallery(filtered);
+            }
+        }
+
+        function renderGallery(items) {
+            const grid = document.getElementById('galleryGrid');
+            if (!items || items.length === 0) {
+                grid.innerHTML = `
+                <div class="col-span-full text-center py-16 text-stone-400">
+                    <span class="material-symbols-outlined text-5xl mb-4 block">inventory_2</span>
+                    <p class="text-lg font-headline font-bold text-stone-500">Belum ada koleksi</p>
+                    <p class="text-sm mt-2">Jadilah yang pertama mengunggah artefak budaya.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+            <div class="gallery-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/5 hover:shadow-xl">
+                <div class="aspect-square overflow-hidden bg-stone-200 flex items-center justify-center relative">
+                    ${item.thumbnail_url || item.file_url
+                    ? `<img alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="${item.thumbnail_url || item.file_url}"/>`
+                    : `<span class="material-symbols-outlined text-5xl text-stone-400">image</span>`
+                }
+                    <div class="absolute top-3 left-3">
+                        <span class="px-2 py-1 bg-primary/80 text-on-primary text-[9px] font-bold uppercase tracking-wider rounded">${item.category || '—'}</span>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <h4 class="font-headline font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">${item.title}</h4>
+                    <p class="text-xs text-on-surface-variant line-clamp-2 mt-2 leading-relaxed">${item.description || '—'}</p>
+                    <div class="flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/10">
+                        <span class="text-[10px] text-outline font-medium">${timeAgo(item.created_at)}</span>
+                        <span class="material-symbols-outlined text-lg text-outline group-hover:text-primary transition-colors">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        loadHome();
+    </script>
+</body>
+
+</html>

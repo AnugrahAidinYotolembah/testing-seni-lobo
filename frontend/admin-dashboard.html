@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lobo Palu | Digital Archive Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#fbfbe2", "surface-container": "#efefd7",
+              "primary-container": "#800000", "secondary-container": "#fed65b",
+              "outline-variant": "#e2bfb9", "error": "#ba1a1a",
+              "on-primary": "#ffffff", "on-surface": "#1b1d0e",
+              "on-surface-variant": "#5a413d", "background": "#fbfbe2",
+              "outline": "#8e706c", "surface-variant": "#e4e4cc",
+              "surface-container-low": "#f5f5dc", "on-secondary": "#ffffff",
+              "tertiary": "#262727", "secondary": "#735c00",
+              "surface-container-high": "#eaead1",
+              "surface-container-highest": "#e4e4cc",
+              "surface-container-lowest": "#ffffff",
+              "primary": "#570000", "on-primary-container": "#ff8371",
+              "on-tertiary-container": "#a8a6a6", "tertiary-container": "#3c3c3c",
+              "surface-dim": "#dbdcc3",
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"], "body": ["Inter"], "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .batik-overlay { opacity: 0.03; pointer-events: none; }
+        .glass-morphism { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .toast { position: fixed; top: 24px; right: 24px; z-index: 9999; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .toast.show { transform: translateX(0); }
+        .toast-success { background: #166534; color: #fff; }
+        .toast-error { background: #991b1b; color: #fff; }
+        .nav-link { transition: all 0.4s ease-in-out; }
+        .nav-link:hover { transform: translateX(4px); }
+        .nav-active { background: rgba(231,229,228,0.5); color: #7f1d1d; border-right: 4px solid #d97706; }
+        .stat-card { transition: transform 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased" data-sidebar="open">
+    <style>
+        /* Responsive Sidebar Styles */
+        body[data-sidebar="open"] #sidebar { transform: translateX(0); }
+        body[data-sidebar="closed"] #sidebar { transform: translateX(-100%); }
+        
+        @media (min-width: 768px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 18rem; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 18rem; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mainContent { margin-left: 0; }
+            body[data-sidebar="closed"] #mainContent { margin-left: 0; }
+            
+            body[data-sidebar="open"] #topHeader { left: 0; }
+            body[data-sidebar="closed"] #topHeader { left: 0; }
+        }
+
+        /* Mobile Overlay */
+        #mobileOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 45;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 767px) {
+            body[data-sidebar="open"] #mobileOverlay { display: block; }
+        }
+    </style>
+<div id="toast" class="toast"></div>
+
+<!-- Mobile Overlay -->
+<div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar Navigation -->
+<aside id="sidebar" class="h-screen w-72 fixed left-0 top-0 border-r border-stone-200/30 bg-stone-100/80 backdrop-blur-2xl shadow-[20px_0_40px_rgba(27,29,14,0.04)] z-50 flex flex-col py-8 px-4 gap-6 transition-transform duration-300">
+    <div class="flex items-start justify-between mb-4 relative">
+        <div class="flex flex-col items-center gap-2 w-full">
+            <div class="w-16 h-16 bg-primary-container rounded-lg flex items-center justify-center shadow-lg">
+                <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">museum</span>
+            </div>
+            <div class="text-center">
+                <h1 class="font-serif font-black text-red-950 text-xl tracking-tight">Lobo Palu</h1>
+                <p class="font-serif text-sm tracking-wide text-stone-500">Digital Curator</p>
+            </div>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden absolute right-0 top-0 p-2 bg-stone-200/50 hover:bg-stone-300 text-stone-600 hover:text-primary rounded-lg transition-all focus:outline-none" title="Tutup Menu">
+            <span class="material-symbols-outlined text-xl">menu_open</span>
+        </button>
+    </div>
+    <nav class="flex-1 flex flex-col gap-1">
+        <a class="nav-link nav-active flex items-center gap-4 px-4 py-3 font-serif text-sm tracking-wide" href="admin-dashboard.html">
+            <span class="material-symbols-outlined">home</span><span>Dashboard</span>
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="admin-collections.html">
+            <span class="material-symbols-outlined">library_books</span><span>Collections</span>
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="admin-users.html">
+            <span class="material-symbols-outlined">admin_panel_settings</span><span>User Monitoring</span>
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="user-portal.html">
+            <span class="material-symbols-outlined">person</span><span>Profile</span>
+        </a>
+    </nav>
+    <div class="mt-auto flex flex-col gap-1 border-t border-stone-200/30 pt-4">
+        <a href="admin-collections.html" class="w-full bg-primary bg-gradient-to-br from-primary to-primary-container text-on-primary py-3 rounded-md font-serif text-sm tracking-wider mb-4 hover:shadow-lg active:scale-95 transition-all text-center block">
+            Create Archive
+        </a>
+        <a class="nav-link flex items-center gap-4 px-4 py-3 text-stone-500 hover:bg-stone-200/30 font-serif text-sm tracking-wide" href="#" onclick="logout()">
+            <span class="material-symbols-outlined">logout</span><span>Logout</span>
+        </a>
+    </div>
+</aside>
+
+<!-- Main Content Area -->
+<main id="mainContent" class="pt-28 px-4 md:px-12 pb-12 min-h-screen relative transition-all duration-300">
+    <div class="batik-overlay fixed inset-0"></div>
+    <!-- Top App Bar -->
+    <header id="topHeader" class="fixed top-0 right-0 z-40 bg-stone-50/70 backdrop-blur-xl shadow-sm h-20 px-4 md:px-8 flex justify-between items-center bg-gradient-to-b from-stone-200/20 to-transparent transition-all duration-300">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="w-10 h-10 bg-white border border-stone-200/50 rounded-full shadow-sm text-stone-600 hover:text-primary hover:border-primary/30 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-0 group" title="Toggle Menu">
+                <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110" id="sidebarIcon">menu_open</span>
+            </button>
+            <h2 class="font-headline font-bold italic text-2xl text-red-900 tracking-tight hidden md:block">Lobo Palu</h2>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="md:flex flex-col items-end pr-2 hidden">
+                    <span id="headerUserName" class="text-sm font-medium text-on-surface leading-tight"></span>
+                    <span class="text-[9px] font-bold text-stone-700 tracking-widest uppercase bg-stone-200 border border-stone-300 px-2 py-0.5 rounded mt-0.5 shadow-sm">Admin</span>
+                </div>
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-secondary/20 hover:border-secondary transition-colors cursor-pointer bg-stone-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-stone-600">person</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Canvas -->
+    <div class="pt-24 md:pt-32 pb-12 md:pb-20 px-6 md:px-12">
+        <!-- Welcome Header -->
+        <div class="mb-8 md:mb-12">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="h-px bg-secondary w-12"></div>
+                <span class="text-secondary font-label text-xs tracking-[0.2em] uppercase">Administrator Dashboard</span>
+            </div>
+            <h1 class="font-headline text-4xl md:text-5xl font-bold text-tertiary mb-4 leading-tight">Digital Repository <br/><span class="text-primary italic">Status Overview</span></h1>
+        </div>
+
+        <!-- Bento Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
+            <!-- Stat Card 1 -->
+            <div class="stat-card col-span-1 md:col-span-2 bg-surface-container-low p-8 rounded-xl relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-secondary font-label text-sm tracking-widest uppercase mb-2">Total Artifacts</p>
+                    <h3 id="statTotalArtifacts" class="font-headline text-6xl font-black text-primary">—</h3>
+                    <div class="mt-6 flex items-center gap-2 text-green-700 font-medium text-sm">
+                        <span class="material-symbols-outlined text-sm">trending_up</span>
+                        <span>Digital archive growing</span>
+                    </div>
+                </div>
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+                </div>
+            </div>
+            <!-- Stat Card 2 -->
+            <div class="stat-card bg-surface-container-highest p-8 rounded-xl relative overflow-hidden flex flex-col justify-between">
+                <div>
+                    <p class="text-on-surface-variant font-label text-xs tracking-widest uppercase mb-1">Active Curators</p>
+                    <h3 id="statActiveCurators" class="font-headline text-4xl font-bold text-tertiary">—</h3>
+                </div>
+                <div class="flex -space-x-3 mt-4">
+                    <div class="w-8 h-8 rounded-full border-2 border-surface bg-stone-300"></div>
+                    <div class="w-8 h-8 rounded-full border-2 border-surface bg-stone-400"></div>
+                    <div class="w-8 h-8 rounded-full border-2 border-surface bg-stone-500"></div>
+                    <div id="statExtraUsers" class="w-8 h-8 rounded-full border-2 border-surface bg-primary flex items-center justify-center text-[10px] text-on-primary">+0</div>
+                </div>
+            </div>
+            <!-- Stat Card 3 -->
+            <div class="stat-card bg-primary bg-gradient-to-br from-primary to-primary-container p-8 rounded-xl shadow-xl flex flex-col justify-between group">
+                <div>
+                    <p class="text-secondary font-label text-xs tracking-widest uppercase mb-1">Archival Collections</p>
+                    <h3 id="statCollections" class="font-headline text-4xl font-bold text-on-primary">—</h3>
+                </div>
+                <a href="admin-collections.html" class="text-secondary-container flex items-center gap-2 group-hover:gap-4 transition-all">
+                    <span class="text-xs font-bold">View Registry</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Ornamental Header -->
+        <div class="flex items-center justify-center gap-4 md:gap-8 mb-8 md:mb-12">
+            <div class="h-px flex-1 bg-gradient-to-r from-transparent to-secondary/30"></div>
+            <h2 class="font-headline text-xl md:text-2xl font-bold text-tertiary px-2 md:px-4 text-center">Archive Statistics</h2>
+            <div class="h-px flex-1 bg-gradient-to-l from-transparent to-secondary/30"></div>
+        </div>
+
+        <!-- Category Distribution Chart -->
+        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_20px_40px_rgba(27,29,14,0.04)] mb-12">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-4 mb-6">
+                <h3 class="font-headline text-lg font-bold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">pie_chart</span>
+                    Registry of Archive Categories
+                </h3>
+            </div>
+            <div id="categoryChartContainer" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div class="col-span-2 py-12 text-center text-stone-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                    <p class="text-sm">Memuat statistik kategori...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Insight Section (Asymmetric) -->
+        <div class="mt-12 md:mt-20 grid grid-cols-12 gap-6 md:gap-10 items-center">
+            <div class="col-span-12 md:col-span-7 rounded-2xl overflow-hidden relative shadow-2xl h-80 md:h-96 bg-stone-200">
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex flex-col justify-end p-6 md:p-12">
+                    <span class="text-secondary font-label text-xs tracking-[0.3em] uppercase mb-2">Featured Collection</span>
+                    <h3 class="font-headline text-2xl md:text-3xl font-bold text-on-primary max-w-md">Lontar Traditional Scripts of Central Sulawesi</h3>
+                </div>
+            </div>
+            <div class="col-span-12 md:col-span-5">
+                <h3 class="font-headline text-4xl font-bold text-tertiary mb-6">Preserving the <span class="italic text-secondary">Soul of Palu</span></h3>
+                <p class="text-on-surface-variant leading-relaxed mb-8">
+                    The Digital Archive is more than storage—it's a living memory. Every entry monitored ensures that the oral histories, ritual artifacts, and performance traditions of the Lobo community remain accessible for generations.
+                </p>
+                <div class="flex gap-4">
+                    <div class="p-6 bg-surface-container-low rounded-xl flex-1 border border-secondary/10">
+                        <span class="material-symbols-outlined text-secondary mb-3">auto_awesome_motion</span>
+                        <h4 class="font-headline font-bold text-primary">Metadata Integrity</h4>
+                        <p class="text-[10px] text-stone-500 mt-1 uppercase tracking-tighter">98% Verified</p>
+                    </div>
+                    <div class="p-6 bg-surface-container-low rounded-xl flex-1 border border-secondary/10">
+                        <span class="material-symbols-outlined text-secondary mb-3">high_quality</span>
+                        <h4 class="font-headline font-bold text-primary">Media Fidelity</h4>
+                        <p class="text-[10px] text-stone-500 mt-1 uppercase tracking-tighter">4K Restoration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="px-12 py-12 border-t border-stone-200/30 flex justify-between items-center relative z-10">
+        <p class="text-xs font-label text-stone-400 tracking-wider">© 2024 Arsip Digital Komunitas Seni Lobo Palu. All Rights Reserved.</p>
+        <div class="flex gap-8">
+            <a class="text-xs font-bold text-secondary tracking-widest uppercase hover:underline" href="#">Guidelines</a>
+            <a class="text-xs font-bold text-secondary tracking-widest uppercase hover:underline" href="#">Privacy Policy</a>
+        </div>
+    </footer>
+</main>
+
+    <script src="js/api.js"></script>
+<script>
+    // Auth guard
+    if (!requireAuth()) { /* redirected */ }
+    if (!requireAdmin()) { /* redirected */ }
+
+    const currentUser = getUser();
+    document.getElementById('headerUserName').textContent = currentUser?.full_name || '';
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type} show`;
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    // Mobile Responsiveness Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.innerWidth < 768) {
+            document.body.setAttribute('data-sidebar', 'closed');
+            const icon = document.getElementById('sidebarIcon');
+            if (icon) icon.textContent = 'menu';
+        }
+    });
+
+    // Sidebar Toggle Logic
+    function toggleSidebar() {
+        const body = document.body;
+        const icon = document.getElementById('sidebarIcon');
+        
+        if (body.getAttribute('data-sidebar') === 'open') {
+            body.setAttribute('data-sidebar', 'closed');
+            if (icon) icon.textContent = 'menu';
+        } else {
+            body.setAttribute('data-sidebar', 'open');
+            if (icon) icon.textContent = 'menu_open';
+        }
+    }
+
+    // Load dashboard data
+    async function loadDashboard() {
+        try {
+            // Load collection stats
+            const stats = await apiGetCollectionStats();
+            document.getElementById('statTotalArtifacts').textContent = (stats.total_artifacts || 0).toLocaleString();
+            document.getElementById('statCollections').textContent = stats.total_collections || 0;
+
+            // Load user stats
+            const userStats = await apiGetUserStats();
+            document.getElementById('statActiveCurators').textContent = (userStats.active_users || 0).toLocaleString();
+            const extra = Math.max(0, (userStats.total_users || 0) - 3);
+            document.getElementById('statExtraUsers').textContent = `+${extra}`;
+
+            // Render Category Distribution Chart
+            renderCategoryChart(stats.categories || {}, stats.total_artifacts || 0);
+        } catch (err) {
+            console.error('Dashboard load error:', err);
+            showToast('Gagal memuat data dashboard', 'error');
+        }
+    }
+
+    function renderCategoryChart(categories, total) {
+        const container = document.getElementById('categoryChartContainer');
+        if (!categories || Object.keys(categories).length === 0) {
+            container.innerHTML = '<div class="col-span-2 py-12 text-center text-stone-400"><p class="text-sm">Belum ada data kategori koleksi.</p></div>';
+            return;
+        }
+
+        const sortedCats = Object.entries(categories).sort((a, b) => b[1] - a[1]);
+        
+        const colors = [
+            'from-primary to-primary-container',
+            'from-secondary to-yellow-600',
+            'from-emerald-700 to-emerald-900',
+            'from-blue-700 to-blue-900',
+            'from-purple-700 to-purple-900',
+            'from-rose-700 to-rose-900',
+            'from-teal-700 to-teal-900',
+            'from-amber-700 to-amber-900',
+        ];
+
+        container.innerHTML = sortedCats.map(([catName, count], idx) => {
+            const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+            const colorClass = colors[idx % colors.length];
+            return `
+                <div class="space-y-2 bg-stone-100/40 p-4 rounded-lg border border-stone-200/20">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-serif font-bold text-red-950">${catName}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-medium text-stone-500">${count} item</span>
+                            <span class="text-xs font-bold text-primary bg-primary-container/10 px-2 py-0.5 rounded">${pct}%</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-stone-200/50 h-3 rounded-full overflow-hidden shadow-inner">
+                        <div class="bg-gradient-to-r ${colorClass} h-full rounded-full transition-all duration-1000" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Initialize Dashboard
+    loadDashboard();
+</script>
+</body>
+</html>
