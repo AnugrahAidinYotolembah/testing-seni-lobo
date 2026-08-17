@@ -182,6 +182,9 @@ async def create_collection(
     collection: CollectionCreate,
     current_user: dict = Depends(get_current_user),
 ):
+    from datetime import datetime, timezone
+    current_time = datetime.now(timezone.utc).isoformat()
+    
     data = {
         "id": str(uuid.uuid4()),
         "title": collection.title,
@@ -192,16 +195,22 @@ async def create_collection(
         "creator_name": collection.creator_name or "",
         "historical_date": collection.historical_date or "",
         "user_id": current_user["sub"],
-        "created_at": "2024-02-14T00:00:00Z",
+        "created_at": current_time,
         "users": {"full_name": current_user.get("email", "User").split("@")[0], "email": current_user.get("email", ""), "avatar_url": ""}
     }
 
     if supabase:
         try:
-            result = supabase.table("collections").insert(data).execute()
+            # Remove relational 'users' key before database insert to prevent column error
+            db_data = dict(data)
+            db_data.pop("users", None)
+            result = supabase.table("collections").insert(db_data).execute()
             if result.data and len(result.data) > 0:
-                LOCAL_COLLECTIONS.insert(0, result.data[0])
-                return {"message": "Collection created", "data": result.data[0]}
+                # Re-inject users key for local cache / API response consistency
+                response_data = result.data[0]
+                response_data["users"] = data["users"]
+                LOCAL_COLLECTIONS.insert(0, response_data)
+                return {"message": "Collection created", "data": response_data}
         except Exception as e:
             print(f"WARNING: Supabase insert failed ({e}). Saving to local collections.")
 
