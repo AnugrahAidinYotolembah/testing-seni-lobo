@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
-JWT_SECRET = os.getenv("JWT_SECRET", "lobo-palu-secret-key-change-in-production")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
+JWT_SECRET = os.getenv("JWT_SECRET", "lobo-palu-secret-key-change-in-production").strip()
 
 supabase = None
 

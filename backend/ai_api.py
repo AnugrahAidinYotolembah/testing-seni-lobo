@@ -16,7 +16,7 @@ class ChatRequest(BaseModel):
 
 @router.post("/chat")
 async def ai_chat(req: ChatRequest):
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
     if not api_key:
         raise HTTPException(status_code=500, detail="OpenRouter API Key not configured in .env")
 
