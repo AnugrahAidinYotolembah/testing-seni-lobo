@@ -54,17 +54,25 @@ async def upload_file(
             print(f"WARNING: Supabase storage upload failed ({e}). Saving to local uploads folder.")
 
     # Local fallback storage
-    local_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "uploads")
-    os.makedirs(local_dir, exist_ok=True)
-    local_file_path = os.path.join(local_dir, unique_name)
-    with open(local_file_path, "wb") as f:
-        f.write(content)
-        
-    local_url = f"http://localhost:3000/uploads/{unique_name}"
-    return {
-        "message": "File uploaded successfully (Local storage)",
-        "url": local_url,
-        "path": local_file_path,
-        "filename": file.filename,
-        "size": len(content),
-    }
+    try:
+        # On Vercel / serverless, local filesystem is read-only except /tmp
+        # Try using /tmp if standard location fails, or raise error
+        local_dir = "/tmp" if os.environ.get("VERCEL") else os.path.join(os.path.dirname(__file__), "..", "frontend", "uploads")
+        os.makedirs(local_dir, exist_ok=True)
+        local_file_path = os.path.join(local_dir, unique_name)
+        with open(local_file_path, "wb") as f:
+            f.write(content)
+            
+        local_url = f"/uploads/{unique_name}" if os.environ.get("VERCEL") else f"http://localhost:3000/uploads/{unique_name}"
+        return {
+            "message": "File uploaded successfully (Temporary/Local storage)",
+            "url": local_url,
+            "path": local_file_path,
+            "filename": file.filename,
+            "size": len(content),
+        }
+    except Exception as local_err:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Gagal mengunggah berkas. Penyimpanan cloud (Supabase) tidak aktif, dan penyimpanan lokal gagal: {str(local_err)}. Pastikan Anda telah membuat Bucket bernama 'archives' di dashboard Supabase Anda dan mengaturnya menjadi Public."
+        )
