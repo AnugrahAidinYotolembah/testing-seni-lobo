@@ -3,7 +3,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://komunitas-seni-lobo-backend.onrender.com/api/:splat"
+  to = "https://testing-seni-lobo.vercel.app/api/:splat"
   status = 200
   force = true
 
