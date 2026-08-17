@@ -59,12 +59,11 @@ async def ai_chat(req: ChatRequest):
     }
     
     models = [
-        "openrouter/free",
-        "nvidia/nemotron-3-nano-30b-a3b:free",
-        "arcee-ai/trinity-large-thinking:free",
-        "baidu/cobuddy:free",
-        "z-ai/glm-4.5-air:free",
-        "google/gemma-4-31b-it:free"
+        "nvidia/nemotron-3.5-lightning:free",
+        "liquid/lfm-2.5-2.6b:free",
+        "meta-llama/llama-3-8b-instruct:free",
+        "google/gemma-2-9b-it:free",
+        "mistralai/mistral-7b-instruct:free"
     ]
 
     last_error = ""
