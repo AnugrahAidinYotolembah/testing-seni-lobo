@@ -46,10 +46,19 @@ async def root():
 @app.get("/api/health")
 async def health():
     import os
-    from config import supabase
+    error_msg = None
+    try:
+        from supabase import create_client
+        test_client = create_client(os.getenv("SUPABASE_URL", ""), os.getenv("SUPABASE_KEY", ""))
+        supabase_connected = test_client is not None
+    except Exception as e:
+        supabase_connected = False
+        error_msg = str(e)
+        
     return {
         "status": "ok",
-        "supabase_connected": supabase is not None,
+        "supabase_connected": supabase_connected,
+        "error_msg": error_msg,
         "url_len": len(os.getenv("SUPABASE_URL", "")),
         "key_len": len(os.getenv("SUPABASE_KEY", "")),
     }
