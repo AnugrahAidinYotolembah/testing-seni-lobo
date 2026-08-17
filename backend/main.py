@@ -45,4 +45,11 @@ async def root():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok"}
+    import os
+    from config import supabase
+    return {
+        "status": "ok",
+        "supabase_connected": supabase is not None,
+        "url_len": len(os.getenv("SUPABASE_URL", "")),
+        "key_len": len(os.getenv("SUPABASE_KEY", "")),
+    }
